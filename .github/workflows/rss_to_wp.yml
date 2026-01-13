@@ -74,6 +74,11 @@ jobs:
           # Logging
           LOG_LEVEL: ${{ secrets.LOG_LEVEL || 'INFO' }}
           TIMEZONE: ${{ secrets.TIMEZONE || 'UTC' }}
+          
+          # Email notifications (optional)
+          SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
         run: |
           ARGS="--config feeds.yaml"
           

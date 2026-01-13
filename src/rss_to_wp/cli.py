@@ -28,7 +28,7 @@ from rss_to_wp.feeds import (
 from rss_to_wp.images import download_image, find_fallback_image, find_rss_image
 from rss_to_wp.rewriter import OpenAIRewriter
 from rss_to_wp.storage import DedupeStore
-from rss_to_wp.utils import get_logger, setup_logging
+from rss_to_wp.utils import get_logger, setup_logging, send_email_notification, build_summary_email
 from rss_to_wp.wordpress import WordPressClient
 
 # Load environment variables from .env file
@@ -156,6 +156,7 @@ def run(
     total_processed = 0
     total_skipped = 0
     total_errors = 0
+    published_articles: list[dict] = []  # Track for email notification
 
     for feed_config in feeds:
         try:
@@ -168,6 +169,7 @@ def run(
                 dry_run=dry_run,
                 hours=hours,
                 logger=logger,
+                published_articles=published_articles,  # Pass for tracking
             )
             total_processed += processed
             total_skipped += skipped
@@ -193,6 +195,25 @@ def run(
         total_errors=total_errors,
     )
 
+    # Send email notification if configured and not dry-run
+    if not dry_run and settings.smtp_email and settings.smtp_password and settings.notification_email:
+        try:
+            subject, html_body = build_summary_email(
+                processed_articles=published_articles,
+                skipped_count=total_skipped,
+                error_count=total_errors,
+                site_name="TippahNews",
+            )
+            send_email_notification(
+                smtp_email=settings.smtp_email,
+                smtp_password=settings.smtp_password,
+                to_email=settings.notification_email,
+                subject=subject,
+                html_body=html_body,
+            )
+        except Exception as e:
+            logger.error("email_notification_error", error=str(e))
+
     if total_errors > 0:
         raise typer.Exit(1)
 
@@ -206,6 +227,7 @@ def process_feed(
     dry_run: bool,
     hours: int,
     logger,
+    published_articles: Optional[list[dict]] = None,
 ) -> tuple[int, int, int]:
     """Process a single feed.
 
@@ -275,6 +297,14 @@ def process_feed(
                     wp_post_url=result.get("link"),
                 )
                 processed += 1
+                
+                # Track for email notification
+                if published_articles is not None and result.get("link"):
+                    published_articles.append({
+                        "title": result.get("title", {}).get("rendered", get_entry_title(entry)),
+                        "url": result.get("link"),
+                        "feed_name": feed_config.name,
+                    })
             else:
                 errors += 1
 

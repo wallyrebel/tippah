@@ -65,6 +65,11 @@ class AppSettings(BaseSettings):
     log_file: Optional[str] = Field(default=None, description="Optional log file path")
     timezone: str = Field(default="UTC", description="Timezone for date calculations")
 
+    # Email notifications (optional)
+    smtp_email: Optional[str] = Field(default=None, description="SMTP sender email")
+    smtp_password: Optional[str] = Field(default=None, description="SMTP password/app password")
+    notification_email: Optional[str] = Field(default=None, description="Email to send notifications to")
+
     @field_validator("wordpress_base_url")
     @classmethod
     def strip_trailing_slash(cls, v: str) -> str:
