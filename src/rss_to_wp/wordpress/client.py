@@ -98,6 +98,54 @@ class WordPressClient:
             logger.warning("duplicate_check_error", slug=slug, error=str(e))
             return False  # Assume no duplicate on error
 
+    def check_duplicate_by_source_url(self, source_url: str) -> bool:
+        """Check if a post containing this source URL already exists.
+
+        This is the most reliable duplicate check since the source URL never changes.
+
+        Args:
+            source_url: Original article source URL.
+
+        Returns:
+            True if exists, False otherwise.
+        """
+        if not source_url:
+            return False
+
+        self._rate_limit()
+
+        try:
+            # Search for posts containing the source URL
+            response = self.session.get(
+                self._api_url("posts"),
+                params={
+                    "search": source_url,
+                    "status": "any",
+                    "per_page": 5,
+                },
+                timeout=(10, 30),
+            )
+            response.raise_for_status()
+            posts = response.json()
+
+            # Check if any post actually contains this exact URL
+            for post in posts:
+                content = post.get("content", {}).get("rendered", "")
+                if source_url in content:
+                    logger.info(
+                        "duplicate_found_by_source_url",
+                        source_url=source_url[:60],
+                        post_id=post.get("id"),
+                        post_title=post.get("title", {}).get("rendered", "")[:50],
+                    )
+                    return True
+
+            return False
+
+        except Exception as e:
+            logger.warning("source_url_check_error", source_url=source_url[:60], error=str(e))
+            return False  # Assume no duplicate on error
+
     def get_or_create_category(self, name: str) -> Optional[int]:
         """Get category ID, creating it if it doesn't exist.
 
@@ -287,15 +335,12 @@ class WordPressClient:
         Returns:
             Created post data or None.
         """
-        # Generate slug from title for duplicate check
-        slug = self._slugify(title)
-        
-        # Check for duplicate by slug BEFORE publishing
-        if self.check_duplicate_by_slug(slug):
+        # PRIMARY CHECK: Check for duplicate by source URL (most reliable - URL never changes)
+        if source_url and self.check_duplicate_by_source_url(source_url):
             logger.warning(
-                "skipping_duplicate_post",
+                "skipping_duplicate_post_by_source",
                 title=title[:50],
-                slug=slug,
+                source_url=source_url[:60],
             )
             return None  # Return None to indicate skip
         
