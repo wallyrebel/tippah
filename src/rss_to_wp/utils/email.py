@@ -7,7 +7,8 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from typing import Optional
 
-from rss_to_wp.utils import get_logger
+# Import directly from logging module to avoid circular import
+from rss_to_wp.utils.logging import get_logger
 
 logger = get_logger("utils.email")
 
