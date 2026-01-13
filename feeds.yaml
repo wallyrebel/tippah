@@ -122,3 +122,117 @@ feeds:
       - "Mississippi"
       - "Local"
     max_per_run: 3
+
+  # =============================================================================
+  # Blue Mountain Christian University Sports
+  # =============================================================================
+
+  # --- BMCU Baseball ---
+  - name: "BMCU Baseball"
+    url: "https://bmcusports.com/rss.aspx?path=baseball"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Baseball"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Men's Basketball ---
+  - name: "BMCU Men's Basketball"
+    url: "https://bmcusports.com/rss.aspx?path=mbball"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Basketball"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Women's Basketball ---
+  - name: "BMCU Women's Basketball"
+    url: "https://bmcusports.com/rss.aspx?path=wbball"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Basketball"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Softball ---
+  - name: "BMCU Softball"
+    url: "https://bmcusports.com/rss.aspx?path=softball"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Softball"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Volleyball ---
+  - name: "BMCU Volleyball"
+    url: "https://bmcusports.com/rss.aspx?path=vball"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Volleyball"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Men's Soccer ---
+  - name: "BMCU Men's Soccer"
+    url: "https://bmcusports.com/rss.aspx?path=msoc"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Soccer"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Women's Soccer ---
+  - name: "BMCU Women's Soccer"
+    url: "https://bmcusports.com/rss.aspx?path=wsoc"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Soccer"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Men's Cross Country ---
+  - name: "BMCU Men's Cross Country"
+    url: "https://bmcusports.com/rss.aspx?path=mcross"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Cross Country"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Women's Cross Country ---
+  - name: "BMCU Women's Cross Country"
+    url: "https://bmcusports.com/rss.aspx?path=wcross"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Cross Country"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Men's Track & Field ---
+  - name: "BMCU Men's Track & Field"
+    url: "https://bmcusports.com/rss.aspx?path=mtrack"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Track and Field"
+      - "College Sports"
+    max_per_run: 3
+
+  # --- BMCU Women's Track & Field ---
+  - name: "BMCU Women's Track & Field"
+    url: "https://bmcusports.com/rss.aspx?path=wtrack"
+    default_category: "Sports"
+    default_tags:
+      - "BMCU"
+      - "Track and Field"
+      - "College Sports"
+    max_per_run: 3
