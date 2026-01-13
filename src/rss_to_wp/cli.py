@@ -195,8 +195,12 @@ def run(
         total_errors=total_errors,
     )
 
-    # Send email notification if configured and not dry-run
-    if not dry_run and settings.smtp_email and settings.smtp_password and settings.notification_email:
+    # Send email notification ONLY if new articles were published
+    if (not dry_run 
+        and published_articles  # Only if there are new articles
+        and settings.smtp_email 
+        and settings.smtp_password 
+        and settings.notification_email):
         try:
             subject, html_body = build_summary_email(
                 processed_articles=published_articles,
