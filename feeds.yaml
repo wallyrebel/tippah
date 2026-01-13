@@ -13,16 +13,6 @@ feeds:
     max_per_run: 3
     use_original_title: false
 
-  # --- National News ---
-  - name: "AP News - US"
-    url: "https://feedx.net/rss/ap-us.xml"
-    default_category: "National News"
-    default_tags:
-      - "AP"
-      - "National"
-    max_per_run: 2
-    use_original_title: false
-
   # --- Northeast Mississippi Community College ---
   - name: "Northeast MS Community College"
     url: "https://fetchrss.com/feed/1vcaujD2G3c21vdUuY5240MW.rss"
