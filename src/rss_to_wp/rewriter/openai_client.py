@@ -119,16 +119,28 @@ ORIGINAL CONTENT:
 Remember to respond with valid JSON containing headline, excerpt, and body."""
 
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
+            # Build API params - use max_completion_tokens for newer models
+            api_params = {
+                "model": self.model,
+                "messages": [
                     {"role": "system", "content": AP_STYLE_PROMPT},
                     {"role": "user", "content": user_prompt},
                 ],
-                max_tokens=self.max_tokens,
-                temperature=0.7,
-                response_format={"type": "json_object"},
-            )
+                "temperature": 0.7,
+            }
+            
+            # Newer models (gpt-4.1, gpt-4o, etc.) use max_completion_tokens
+            # Older models use max_tokens
+            if any(x in self.model.lower() for x in ["4.1", "4o", "o1", "o3", "o4"]):
+                api_params["max_completion_tokens"] = self.max_tokens
+            else:
+                api_params["max_tokens"] = self.max_tokens
+            
+            # Only add response_format for models that support it
+            if "o1" not in self.model.lower():
+                api_params["response_format"] = {"type": "json_object"}
+            
+            response = self.client.chat.completions.create(**api_params)
 
             # Parse response
             response_text = response.choices[0].message.content
