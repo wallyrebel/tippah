@@ -50,14 +50,14 @@ class OpenAIRewriter:
     def __init__(
         self,
         api_key: str,
-        model: str = "gpt-5-mini",
+        model: str = "gpt-4.1-nano",
         max_tokens: int = 2000,
     ):
         """Initialize OpenAI rewriter.
 
         Args:
             api_key: OpenAI API key.
-            model: Model to use (default: gpt-5-mini).
+            model: Model to use (default: gpt-4.1-nano).
             max_tokens: Maximum tokens in response.
         """
         self.client = OpenAI(api_key=api_key)
@@ -252,7 +252,7 @@ def rewrite_with_openai(
     content: str,
     original_title: str,
     api_key: str,
-    model: str = "gpt-5-mini",
+    model: str = "gpt-4.1-nano",
     use_original_title: bool = False,
 ) -> Optional[dict]:
     """Convenience function to rewrite content.
