@@ -287,6 +287,18 @@ class WordPressClient:
         Returns:
             Created post data or None.
         """
+        # Generate slug from title for duplicate check
+        slug = self._slugify(title)
+        
+        # Check for duplicate by slug BEFORE publishing
+        if self.check_duplicate_by_slug(slug):
+            logger.warning(
+                "skipping_duplicate_post",
+                title=title[:50],
+                slug=slug,
+            )
+            return None  # Return None to indicate skip
+        
         self._rate_limit()
 
         # Add source attribution to content
