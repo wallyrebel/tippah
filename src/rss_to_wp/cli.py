@@ -218,7 +218,9 @@ def run(
         except Exception as e:
             logger.error("email_notification_error", error=str(e))
 
-    if total_errors > 0:
+    # Only fail if nothing was processed AND nothing was skipped (complete failure)
+    # Partial failures (some articles succeed, some fail) should not cause the run to fail
+    if total_errors > 0 and total_processed == 0 and total_skipped == 0:
         raise typer.Exit(1)
 
 
