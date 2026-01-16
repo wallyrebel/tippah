@@ -245,3 +245,12 @@ feeds:
       - "Track and Field"
       - "College Sports"
     max_per_run: 3
+
+  # --- FetchRSS Feed 14 ---
+  - name: "Local Feed 14"
+    url: "https://fetchrss.com/feed/1vcaujD2G3c21vgnHqF4TAaZ.rss"
+    default_category: "Local News"
+    default_tags:
+      - "Mississippi"
+      - "Local"
+    max_per_run: 3
