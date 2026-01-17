@@ -254,3 +254,12 @@ feeds:
       - "Mississippi"
       - "Local"
     max_per_run: 3
+
+  # --- FetchRSS Feed 15 ---
+  - name: "Local Feed 15"
+    url: "https://fetchrss.com/feed/1vcaujD2G3c21vhBbG8np6c8.rss"
+    default_category: "Local News"
+    default_tags:
+      - "Mississippi"
+      - "Local"
+    max_per_run: 3
