@@ -263,3 +263,201 @@ feeds:
       - "Mississippi"
       - "Local"
     max_per_run: 3
+
+  # =============================================================================
+  # Additional Mississippi Statewide Sources
+  # =============================================================================
+
+  - name: "Mississippi Today"
+    url: "https://mississippitoday.org/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+    max_per_run: 3
+
+  - name: "Magnolia Tribune"
+    url: "https://magnoliatribune.com/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Politics"
+    max_per_run: 3
+
+  - name: "SuperTalk Mississippi"
+    url: "https://supertalk.fm/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Current Events"
+    max_per_run: 3
+
+  - name: "WJTV Mississippi"
+    url: "https://www.wjtv.com/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Breaking News"
+    max_per_run: 3
+
+  - name: "WAPT Top Stories"
+    url: "https://www.wapt.com/topstories-rss"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Top Stories"
+    max_per_run: 3
+
+  - name: "Mississippi Free Press"
+    url: "https://www.mississippifreepress.org/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Public Affairs"
+    max_per_run: 3
+
+  - name: "Daily Journal Mississippi"
+    url: "https://www.djournal.com/search/?f=rss"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Northeast Mississippi"
+    max_per_run: 3
+
+  - name: "WCBI Mississippi"
+    url: "https://www.wcbi.com/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Television News"
+    max_per_run: 3
+
+  - name: "WXXV News 25"
+    url: "https://www.wxxv25.com/feed/"
+    default_category: "Mississippi News"
+    default_tags:
+      - "Mississippi"
+      - "Statewide"
+      - "Gulf Coast"
+    max_per_run: 3
+
+  # =============================================================================
+  # Additional National Headline Sources
+  # =============================================================================
+
+  - name: "CBS News National Headlines"
+    url: "https://www.cbsnews.com/latest/rss/main"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+    max_per_run: 3
+
+  - name: "NPR National Headlines"
+    url: "https://feeds.npr.org/1001/rss.xml"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+      - "NPR"
+    max_per_run: 3
+
+  - name: "New York Times U.S."
+    url: "https://rss.nytimes.com/services/xml/rss/nyt/US.xml"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+      - "United States"
+    max_per_run: 3
+
+  - name: "ABC News Top Stories"
+    url: "https://abcnews.go.com/abcnews/topstories"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+      - "Top Stories"
+    max_per_run: 3
+
+  - name: "BBC U.S. & Canada"
+    url: "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+      - "U.S."
+    max_per_run: 3
+
+  - name: "Fox News Latest"
+    url: "https://feeds.feedburner.com/foxnews/latest"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+      - "Latest"
+    max_per_run: 3
+
+  - name: "The Hill Home News"
+    url: "https://thehill.com/homenews/feed/"
+    default_category: "National News"
+    default_tags:
+      - "National"
+      - "Headlines"
+      - "Politics"
+    max_per_run: 3
+
+weekly_columns:
+  - name: "The Faith & Life Column"
+    slug: "faith-life-column"
+    column_type: "christian"
+    day_of_week: "monday"
+    default_category: "Faith"
+    default_tags:
+      - "Christianity"
+      - "Faith"
+      - "Weekly Column"
+    context_feeds:
+      - "https://mississippitoday.org/feed/"
+      - "https://feeds.npr.org/1001/rss.xml"
+    context_hours: 168
+    max_context_entries: 8
+
+  - name: "The Front Porch Notebook"
+    slug: "front-porch-notebook"
+    column_type: "human_interest"
+    day_of_week: "wednesday"
+    default_category: "Opinion"
+    default_tags:
+      - "Human Interest"
+      - "Weekly Column"
+      - "Syndicated Style"
+    context_feeds:
+      - "https://www.cbsnews.com/latest/rss/main"
+      - "https://www.wjtv.com/feed/"
+      - "https://www.wapt.com/topstories-rss"
+    context_hours: 168
+    max_context_entries: 8
+
+  - name: "National Sports Desk"
+    slug: "national-sports-desk"
+    column_type: "sports"
+    day_of_week: "friday"
+    default_category: "Sports"
+    default_tags:
+      - "Sports"
+      - "Weekly Column"
+      - "National Sports"
+    context_feeds:
+      - "https://www.espn.com/espn/rss/news"
+      - "https://www.cbssports.com/rss/headlines/"
+      - "https://sports.yahoo.com/rss/"
+    context_hours: 168
+    max_context_entries: 8

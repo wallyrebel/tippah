@@ -2,18 +2,21 @@
 
 from __future__ import annotations
 
-import sys
+import re
 import time
 from pathlib import Path
 from typing import Optional
 
+import pendulum
 import typer
+from bs4 import BeautifulSoup
 from dotenv import load_dotenv
 
 from rss_to_wp import __version__
 from rss_to_wp.config import (
     AppSettings,
     FeedConfig,
+    WeeklyColumnConfig,
     get_app_settings,
     load_feeds_config,
 )
@@ -25,10 +28,15 @@ from rss_to_wp.feeds import (
     parse_feed,
     pick_entries,
 )
-from rss_to_wp.images import download_image, find_fallback_image, find_rss_image
+from rss_to_wp.images import PexelsClient, download_image, find_fallback_image, find_rss_image
 from rss_to_wp.rewriter import OpenAIRewriter
 from rss_to_wp.storage import DedupeStore
-from rss_to_wp.utils import get_logger, setup_logging, send_email_notification, build_summary_email
+from rss_to_wp.utils import (
+    build_summary_email,
+    get_logger,
+    send_email_notification,
+    setup_logging,
+)
 from rss_to_wp.wordpress import WordPressClient
 
 # Load environment variables from .env file
@@ -39,6 +47,262 @@ app = typer.Typer(
     help="Automated RSS feed to WordPress publisher with AI rewriting.",
     add_completion=False,
 )
+
+WEEKDAY_TO_INDEX = {
+    "monday": 0,
+    "tuesday": 1,
+    "wednesday": 2,
+    "thursday": 3,
+    "friday": 4,
+    "saturday": 5,
+    "sunday": 6,
+}
+
+LOW_INFORMATION_MARKERS = [
+    "content unavailable due to privacy settings",
+    "content unavailable due to deletion",
+    "content unavailable",
+    "this content is unavailable",
+    "this content isn't available right now",
+    "page unavailable",
+    "post unavailable",
+    "you must be logged in",
+    "sign in to continue",
+]
+
+
+def _strip_html_for_quality(content: str) -> str:
+    """Convert HTML content to plain text for quality checks."""
+    try:
+        soup = BeautifulSoup(content, "html.parser")
+        for element in soup(["script", "style", "nav", "footer", "header"]):
+            element.decompose()
+        text = soup.get_text(separator=" ")
+    except Exception:
+        text = re.sub(r"<[^>]+>", " ", content)
+
+    text = re.sub(r"\s+", " ", text).strip()
+    return text
+
+
+def _has_sufficient_story_content(content: str) -> tuple[bool, str]:
+    """Guardrail to skip entries with thin or placeholder text."""
+    text = _strip_html_for_quality(content)
+    if not text:
+        return (False, "empty_content")
+
+    lower = text.lower()
+    if any(marker in lower for marker in LOW_INFORMATION_MARKERS):
+        return (False, "placeholder_or_unavailable_content")
+
+    words = [word for word in text.split() if word]
+    if len(words) < 35:
+        return (False, "too_few_words")
+
+    meaningful_sentences = [
+        sentence.strip()
+        for sentence in re.split(r"[.!?]+", text)
+        if len(sentence.strip().split()) >= 8
+    ]
+    if len(words) < 80 and len(meaningful_sentences) < 2:
+        return (False, "too_few_meaningful_sentences")
+
+    return (True, "ok")
+
+
+def _collect_column_context(
+    column_config: WeeklyColumnConfig,
+    settings: AppSettings,
+    logger,
+) -> list[dict[str, str]]:
+    """Collect recent context headlines for weekly columnist generation."""
+    context_items: list[dict[str, str]] = []
+
+    for context_feed_url in column_config.context_feeds:
+        feed = parse_feed(context_feed_url)
+        if not feed or not feed.entries:
+            continue
+
+        selected_entries = pick_entries(
+            entries=feed.entries,
+            max_count=column_config.max_context_entries,
+            hours_window=column_config.context_hours,
+            timezone=settings.timezone,
+        )
+
+        for entry in selected_entries:
+            title = get_entry_title(entry)
+            link = get_entry_link(entry) or ""
+            if not title:
+                continue
+
+            context_items.append(
+                {
+                    "title": title,
+                    "link": link,
+                    "source": context_feed_url,
+                }
+            )
+
+            if len(context_items) >= column_config.max_context_entries:
+                break
+
+        if len(context_items) >= column_config.max_context_entries:
+            break
+
+    logger.info(
+        "weekly_column_context_collected",
+        column=column_config.name,
+        count=len(context_items),
+    )
+    return context_items
+
+
+def _is_column_day(column_config: WeeklyColumnConfig, timezone: str) -> bool:
+    """Check whether a weekly column should run today."""
+    now = pendulum.now(timezone)
+    target_day = WEEKDAY_TO_INDEX[column_config.day_of_week]
+    return now.day_of_week == target_day
+
+
+def process_weekly_columns(
+    columns: list[WeeklyColumnConfig],
+    settings: AppSettings,
+    dedupe_store: DedupeStore,
+    rewriter: OpenAIRewriter,
+    wp_client: Optional[WordPressClient],
+    dry_run: bool,
+    logger,
+    published_articles: Optional[list[dict]] = None,
+) -> tuple[int, int, int]:
+    """Generate and publish configured weekly columnist posts."""
+    processed = 0
+    skipped = 0
+    errors = 0
+
+    if not columns:
+        return (processed, skipped, errors)
+
+    now = pendulum.now(settings.timezone)
+    iso_year, iso_week, _ = now.isocalendar()
+
+    for column_config in columns:
+        if not _is_column_day(column_config, settings.timezone):
+            logger.debug(
+                "weekly_column_not_scheduled_today",
+                column=column_config.name,
+                scheduled_day=column_config.day_of_week,
+            )
+            continue
+
+        column_key = f"column:{column_config.slug}:{iso_year}-W{iso_week:02d}"
+        if dedupe_store.is_processed(column_key):
+            logger.info(
+                "weekly_column_already_processed",
+                column=column_config.name,
+                week=f"{iso_year}-W{iso_week:02d}",
+            )
+            skipped += 1
+            continue
+
+        logger.info("processing_weekly_column", name=column_config.name, type=column_config.column_type)
+
+        context_items = _collect_column_context(column_config, settings, logger)
+        rewritten = rewriter.write_weekly_column(
+            column_name=column_config.name,
+            column_type=column_config.column_type,
+            current_date=now.format("MMMM D, YYYY"),
+            context_items=context_items,
+        )
+        if not rewritten:
+            logger.error("weekly_column_generation_failed", name=column_config.name)
+            errors += 1
+            continue
+
+        image_result = None
+        image_alt = rewritten["headline"][:120]
+        featured_media_id = None
+
+        # Weekly columns should use Pexels for stock imagery.
+        if settings.pexels_api_key:
+            try:
+                pexels_query = rewritten.get("image_query") or rewritten["headline"]
+                pexels_result = PexelsClient(settings.pexels_api_key).search(pexels_query)
+                if pexels_result:
+                    image_result = download_image(pexels_result["url"])
+                    if image_result:
+                        image_alt = pexels_result.get("alt_text", image_alt)
+            except Exception as e:
+                logger.warning(
+                    "weekly_column_pexels_error",
+                    column=column_config.name,
+                    error=str(e),
+                )
+
+        if dry_run:
+            logger.info(
+                "dry_run_would_publish_weekly_column",
+                column=column_config.name,
+                headline=rewritten["headline"][:70],
+                category=column_config.default_category,
+            )
+            processed += 1
+            continue
+
+        if not wp_client:
+            errors += 1
+            continue
+
+        if image_result:
+            image_bytes, filename, _ = image_result
+            featured_media_id = wp_client.upload_media(
+                image_bytes=image_bytes,
+                filename=filename,
+                alt_text=image_alt,
+            )
+
+        category_id = None
+        if column_config.default_category:
+            category_id = wp_client.get_or_create_category(column_config.default_category)
+
+        tag_ids = []
+        if column_config.default_tags:
+            tag_ids = wp_client.get_or_create_tags(column_config.default_tags)
+
+        post = wp_client.create_post(
+            title=rewritten["headline"],
+            content=rewritten["body"],
+            excerpt=rewritten.get("excerpt", ""),
+            category_id=category_id,
+            tag_ids=tag_ids,
+            featured_media_id=featured_media_id,
+            source_url=None,
+        )
+        if not post:
+            errors += 1
+            continue
+
+        dedupe_store.mark_processed(
+            entry_key=column_key,
+            feed_url=f"column:{column_config.slug}",
+            entry_title=rewritten["headline"],
+            entry_link=f"weekly-column://{column_config.slug}/{iso_year}-W{iso_week:02d}",
+            category=column_config.default_category or None,
+            wp_post_id=post.get("id"),
+            wp_post_url=post.get("link"),
+        )
+        processed += 1
+
+        if published_articles is not None and post.get("link"):
+            published_articles.append(
+                {
+                    "title": post.get("title", {}).get("rendered", rewritten["headline"]),
+                    "url": post.get("link"),
+                    "feed_name": f"Weekly Column: {column_config.name}",
+                }
+            )
+
+    return (processed, skipped, errors)
 
 
 def version_callback(value: bool) -> None:
@@ -126,6 +390,7 @@ def run(
         raise typer.Exit(1)
 
     feeds = feeds_config.feeds
+    weekly_columns = feeds_config.weekly_columns
 
     # Filter to single feed if specified
     if single_feed:
@@ -134,13 +399,42 @@ def run(
             logger.error("feed_not_found", name=single_feed)
             raise typer.Exit(1)
 
-    logger.info("feeds_loaded", count=len(feeds))
+    logger.info(
+        "feeds_loaded",
+        count=len(feeds),
+        weekly_columns=len(weekly_columns),
+    )
 
     # Initialize components
     dedupe_store = DedupeStore()
+
+    category_limits = {
+        "Mississippi News": max(0, settings.max_daily_mississippi_posts),
+        "National News": max(0, settings.max_daily_national_posts),
+    }
+    now_local = pendulum.now(settings.timezone)
+    day_start_utc = now_local.start_of("day").in_timezone("UTC").naive().isoformat()
+    day_end_utc = now_local.start_of("day").add(days=1).in_timezone("UTC").naive().isoformat()
+    category_counts = {
+        category: dedupe_store.get_published_count_for_category_between(
+            category=category,
+            start_utc_iso=day_start_utc,
+            end_utc_iso=day_end_utc,
+        )
+        for category in category_limits
+    }
+    logger.info(
+        "daily_category_limits_loaded",
+        limits=category_limits,
+        current_counts=category_counts,
+        day_start_utc=day_start_utc,
+        day_end_utc=day_end_utc,
+    )
+
     rewriter = OpenAIRewriter(
         api_key=settings.openai_api_key,
         model=settings.openai_model,
+        fallback_model=settings.openai_fallback_model,
     )
 
     wp_client = None
@@ -169,6 +463,8 @@ def run(
                 dry_run=dry_run,
                 hours=hours,
                 logger=logger,
+                category_limits=category_limits,
+                category_counts=category_counts,
                 published_articles=published_articles,  # Pass for tracking
             )
             total_processed += processed
@@ -186,6 +482,28 @@ def run(
             )
             total_errors += 1
             continue
+
+    # Process configured weekly columns after RSS feed ingest.
+    if single_feed:
+        logger.info("weekly_columns_skipped_for_single_feed_run", feed=single_feed)
+    else:
+        try:
+            column_processed, column_skipped, column_errors = process_weekly_columns(
+                columns=weekly_columns,
+                settings=settings,
+                dedupe_store=dedupe_store,
+                rewriter=rewriter,
+                wp_client=wp_client,
+                dry_run=dry_run,
+                logger=logger,
+                published_articles=published_articles,
+            )
+            total_processed += column_processed
+            total_skipped += column_skipped
+            total_errors += column_errors
+        except Exception as e:
+            logger.error("weekly_columns_processing_error", error=str(e))
+            total_errors += 1
 
     # Summary
     logger.info(
@@ -233,6 +551,8 @@ def process_feed(
     dry_run: bool,
     hours: int,
     logger,
+    category_limits: dict[str, int],
+    category_counts: dict[str, int],
     published_articles: Optional[list[dict]] = None,
 ) -> tuple[int, int, int]:
     """Process a single feed.
@@ -266,7 +586,23 @@ def process_feed(
 
     logger.info("entries_to_process", name=feed_config.name, count=len(entries))
 
-    for entry in entries:
+    feed_category = feed_config.default_category or ""
+
+    for entry_idx, entry in enumerate(entries):
+        if not dry_run and feed_category in category_limits:
+            category_limit = category_limits[feed_category]
+            current_count = category_counts.get(feed_category, 0)
+            if current_count >= category_limit:
+                logger.info(
+                    "daily_category_limit_reached",
+                    category=feed_category,
+                    current_count=current_count,
+                    limit=category_limit,
+                    feed=feed_config.name,
+                )
+                skipped += len(entries) - entry_idx
+                break
+
         try:
             # Generate unique key
             entry_key = generate_entry_key(entry, feed_config.url)
@@ -292,27 +628,52 @@ def process_feed(
                 logger=logger,
             )
 
-            if result:
+            if not result:
+                errors += 1
+                continue
+
+            status = result.get("_status", "published")
+            if status == "skipped":
+                if not dry_run:
+                    dedupe_store.mark_processed(
+                        entry_key=entry_key,
+                        feed_url=feed_config.url,
+                        entry_title=get_entry_title(entry),
+                        entry_link=get_entry_link(entry) or "",
+                        category=None,
+                        wp_post_id=None,
+                        wp_post_url=None,
+                    )
+                skipped += 1
+                continue
+
+            if status != "published":
+                errors += 1
+                continue
+
+            if not dry_run:
                 # Mark as processed
                 dedupe_store.mark_processed(
                     entry_key=entry_key,
                     feed_url=feed_config.url,
                     entry_title=get_entry_title(entry),
                     entry_link=get_entry_link(entry) or "",
+                    category=feed_category or None,
                     wp_post_id=result.get("id"),
                     wp_post_url=result.get("link"),
                 )
-                processed += 1
-                
-                # Track for email notification
-                if published_articles is not None and result.get("link"):
-                    published_articles.append({
-                        "title": result.get("title", {}).get("rendered", get_entry_title(entry)),
-                        "url": result.get("link"),
-                        "feed_name": feed_config.name,
-                    })
-            else:
-                errors += 1
+                if feed_category in category_limits:
+                    category_counts[feed_category] = category_counts.get(feed_category, 0) + 1
+
+            processed += 1
+
+            # Track for email notification
+            if not dry_run and published_articles is not None and result.get("link"):
+                published_articles.append({
+                    "title": result.get("title", {}).get("rendered", get_entry_title(entry)),
+                    "url": result.get("link"),
+                    "feed_name": feed_config.name,
+                })
 
             # Rate limit between entries
             time.sleep(1)
@@ -349,6 +710,16 @@ def process_entry(
 
     logger.info("processing_entry", title=title[:50])
 
+    quality_ok, quality_reason = _has_sufficient_story_content(content)
+    if not quality_ok:
+        logger.warning(
+            "entry_skipped_low_information",
+            title=title[:50],
+            reason=quality_reason,
+            link=link,
+        )
+        return {"_status": "skipped", "_skip_reason": quality_reason}
+
     # Rewrite with OpenAI
     rewritten = rewriter.rewrite(
         content=content,
@@ -362,6 +733,7 @@ def process_entry(
 
     # Find image
     featured_media_id = None
+    image_result = None
 
     # Try RSS image first
     image_url = find_rss_image(entry, base_url=link or "")
@@ -424,7 +796,11 @@ def process_entry(
             category=feed_config.default_category,
             tags=feed_config.default_tags,
         )
-        return {"id": 0, "link": "dry-run://not-published"}
+        return {
+            "_status": "published",
+            "id": 0,
+            "link": "dry-run://not-published",
+        }
 
     if not wp_client:
         return None
@@ -439,6 +815,10 @@ def process_entry(
         source_url=link,
     )
 
+    if not post:
+        return None
+
+    post["_status"] = "published"
     return post
 
 

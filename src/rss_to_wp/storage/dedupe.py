@@ -37,6 +37,7 @@ class DedupeStore:
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     entry_key TEXT UNIQUE NOT NULL,
                     feed_url TEXT,
+                    category TEXT,
                     entry_title TEXT,
                     entry_link TEXT,
                     wp_post_id INTEGER,
@@ -52,6 +53,21 @@ class DedupeStore:
                 CREATE INDEX IF NOT EXISTS idx_feed_url
                 ON processed_entries(feed_url)
             """)
+
+            # Lightweight migration for existing databases created before
+            # the category column existed.
+            columns = {
+                row["name"]
+                for row in conn.execute("PRAGMA table_info(processed_entries)").fetchall()
+            }
+            if "category" not in columns:
+                conn.execute("ALTER TABLE processed_entries ADD COLUMN category TEXT")
+
+            conn.execute("""
+                CREATE INDEX IF NOT EXISTS idx_category_processed_at
+                ON processed_entries(category, processed_at)
+            """)
+
             conn.commit()
 
         logger.debug("database_initialized", path=str(self.db_path))
@@ -93,6 +109,7 @@ class DedupeStore:
         feed_url: str,
         entry_title: str,
         entry_link: str,
+        category: Optional[str] = None,
         wp_post_id: Optional[int] = None,
         wp_post_url: Optional[str] = None,
     ) -> None:
@@ -103,6 +120,7 @@ class DedupeStore:
             feed_url: URL of the source feed.
             entry_title: Title of the entry.
             entry_link: Original link of the entry.
+            category: Optional content category name.
             wp_post_id: WordPress post ID (if published).
             wp_post_url: WordPress post URL (if published).
         """
@@ -110,12 +128,13 @@ class DedupeStore:
             conn.execute(
                 """
                 INSERT OR REPLACE INTO processed_entries
-                (entry_key, feed_url, entry_title, entry_link, wp_post_id, wp_post_url, processed_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?)
+                (entry_key, feed_url, category, entry_title, entry_link, wp_post_id, wp_post_url, processed_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     entry_key,
                     feed_url,
+                    category,
                     entry_title,
                     entry_link,
                     wp_post_id,
@@ -128,8 +147,30 @@ class DedupeStore:
         logger.info(
             "entry_marked_processed",
             key=entry_key,
+            category=category,
             wp_post_id=wp_post_id,
         )
+
+    def get_published_count_for_category_between(
+        self,
+        category: str,
+        start_utc_iso: str,
+        end_utc_iso: str,
+    ) -> int:
+        """Get published post count for a category within a UTC time window."""
+        with self._get_connection() as conn:
+            cursor = conn.execute(
+                """
+                SELECT COUNT(*)
+                FROM processed_entries
+                WHERE category = ?
+                  AND wp_post_id IS NOT NULL
+                  AND processed_at >= ?
+                  AND processed_at < ?
+                """,
+                (category, start_utc_iso, end_utc_iso),
+            )
+            return cursor.fetchone()[0]
 
     def get_processed_count(self, feed_url: Optional[str] = None) -> int:
         """Get count of processed entries.

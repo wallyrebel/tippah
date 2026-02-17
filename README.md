@@ -5,13 +5,16 @@ Automated RSS feed monitoring, AI-powered article rewriting, and WordPress publi
 ## Features
 
 - **RSS Feed Monitoring**: Parse RSS/Atom feeds with robust error handling
-- **AI Rewriting**: Convert press releases to AP-style news articles using GPT-5 mini
+- **AI Rewriting**: Convert feed content to AP-style news using GPT-5 mini with GPT-4.1 nano fallback
 - **Smart Deduplication**: SQLite-based tracking ensures no duplicate posts
 - **Image Handling**: 
   - Extract images from RSS (media:content, enclosures, HTML)
   - Fallback to Pexels/Unsplash for stock photos
   - Proper attribution in alt text
 - **WordPress Publishing**: Full REST API integration with categories and tags
+- **Weekly Columns**: Optional once-weekly columnist generation and auto-posting
+- **Quality Guardrails**: Skips low-information or placeholder feed entries
+- **Daily Category Caps**: Limits `Mississippi News` and `National News` volume per day
 - **Scheduling**: GitHub Actions (every 15 min) or VPS cron/systemd
 
 ## Quick Start
@@ -46,6 +49,10 @@ cp .env.example .env
 - `WORDPRESS_APP_PASSWORD` - [Generate an Application Password](https://make.wordpress.org/core/2020/11/05/application-passwords-integration-guide/)
 
 **Optional variables:**
+- `OPENAI_MODEL` - Primary model (default: `gpt-5-mini`)
+- `OPENAI_FALLBACK_MODEL` - Fallback model (default: `gpt-4.1-nano`)
+- `MAX_DAILY_MISSISSIPPI_POSTS` - Daily publish cap for `Mississippi News` (default: `8`)
+- `MAX_DAILY_NATIONAL_POSTS` - Daily publish cap for `National News` (default: `8`)
 - `PEXELS_API_KEY` - For fallback images ([Get key](https://www.pexels.com/api/))
 - `UNSPLASH_ACCESS_KEY` - For fallback images ([Get key](https://unsplash.com/developers))
 
@@ -108,6 +115,19 @@ feeds:
       - "Tag2"
     max_per_run: 5                 # Optional: Max entries per run (default: 5)
     use_original_title: false      # Optional: Keep original title (default: false)
+
+weekly_columns:
+  - name: "Weekly Column Name"
+    slug: "weekly-column-slug"
+    column_type: "christian"       # christian | human_interest | sports
+    day_of_week: "monday"          # Runs once on that weekday
+    default_category: "Opinion"
+    default_tags:
+      - "Weekly Column"
+    context_feeds:
+      - "https://example.com/feed/"
+    context_hours: 168
+    max_context_entries: 8
 ```
 
 ## GitHub Actions Setup
@@ -121,6 +141,8 @@ Go to **Settings > Secrets and variables > Actions** and add:
 | Secret | Required | Description |
 |--------|----------|-------------|
 | `OPENAI_API_KEY` | ✅ | OpenAI API key |
+| `OPENAI_MODEL` | ❌ | Primary model (default: `gpt-5-mini`) |
+| `OPENAI_FALLBACK_MODEL` | ❌ | Fallback model (default: `gpt-4.1-nano`) |
 | `WORDPRESS_BASE_URL` | ✅ | Site URL (e.g., `https://example.com`) |
 | `WORDPRESS_USERNAME` | ✅ | WordPress username |
 | `WORDPRESS_APP_PASSWORD` | ✅ | Application password |
@@ -210,6 +232,8 @@ sudo systemctl start rss-to-wp.timer
 ├── requirements.txt
 └── README.md
 ```
+
+Core workflow reference: `docs/CORE_FUNCTIONS.md`
 
 ## Troubleshooting
 

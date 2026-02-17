@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import os
 from pathlib import Path
 from typing import Optional
 
@@ -31,10 +30,62 @@ class FeedConfig(BaseModel):
         return v
 
 
+class WeeklyColumnConfig(BaseModel):
+    """Configuration for a weekly auto-generated columnist post."""
+
+    name: str
+    slug: str
+    column_type: str
+    default_category: str = "Opinion"
+    default_tags: list[str] = Field(default_factory=list)
+    day_of_week: str = "monday"
+    context_feeds: list[str] = Field(default_factory=list)
+    context_hours: int = 168
+    max_context_entries: int = 8
+
+    @field_validator("column_type")
+    @classmethod
+    def validate_column_type(cls, v: str) -> str:
+        """Validate supported columnist types."""
+        allowed = {"christian", "human_interest", "sports"}
+        value = v.strip().lower()
+        if value not in allowed:
+            raise ValueError(f"Invalid column_type: {v}. Allowed: {sorted(allowed)}")
+        return value
+
+    @field_validator("day_of_week")
+    @classmethod
+    def validate_day_of_week(cls, v: str) -> str:
+        """Normalize and validate day of week."""
+        allowed = {
+            "monday",
+            "tuesday",
+            "wednesday",
+            "thursday",
+            "friday",
+            "saturday",
+            "sunday",
+        }
+        value = v.strip().lower()
+        if value not in allowed:
+            raise ValueError(f"Invalid day_of_week: {v}. Allowed: {sorted(allowed)}")
+        return value
+
+    @field_validator("context_feeds")
+    @classmethod
+    def validate_context_feeds(cls, feeds: list[str]) -> list[str]:
+        """Ensure context feed URLs are valid."""
+        for feed in feeds:
+            if not feed.startswith(("http://", "https://")):
+                raise ValueError(f"Invalid context feed URL: {feed}")
+        return feeds
+
+
 class FeedsConfig(BaseModel):
     """Container for all feed configurations."""
 
     feeds: list[FeedConfig] = Field(default_factory=list)
+    weekly_columns: list[WeeklyColumnConfig] = Field(default_factory=list)
 
 
 class AppSettings(BaseSettings):
@@ -48,7 +99,11 @@ class AppSettings(BaseSettings):
 
     # OpenAI
     openai_api_key: str = Field(..., description="OpenAI API key")
-    openai_model: str = Field(default="gpt-4.1-nano", description="OpenAI model to use")
+    openai_model: str = Field(default="gpt-5-mini", description="Primary OpenAI model")
+    openai_fallback_model: str = Field(
+        default="gpt-4.1-nano",
+        description="Fallback OpenAI model",
+    )
 
     # WordPress
     wordpress_base_url: str = Field(..., description="WordPress site URL")
@@ -64,6 +119,16 @@ class AppSettings(BaseSettings):
     log_level: str = Field(default="INFO", description="Log level")
     log_file: Optional[str] = Field(default=None, description="Optional log file path")
     timezone: str = Field(default="UTC", description="Timezone for date calculations")
+
+    # Category daily publish caps
+    max_daily_mississippi_posts: int = Field(
+        default=8,
+        description="Daily publish cap for Mississippi News category",
+    )
+    max_daily_national_posts: int = Field(
+        default=8,
+        description="Daily publish cap for National News category",
+    )
 
     # Email notifications (optional)
     smtp_email: Optional[str] = Field(default=None, description="SMTP sender email")
