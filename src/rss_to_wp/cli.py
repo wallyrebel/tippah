@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 import time
 from pathlib import Path
@@ -18,8 +19,10 @@ from rss_to_wp.config import (
     FeedConfig,
     WeeklyColumnConfig,
     get_app_settings,
+    get_data_dir,
     load_feeds_config,
 )
+from rss_to_wp.editorial import canonical_source_url, route_categories, source_fingerprint
 from rss_to_wp.feeds import (
     generate_entry_key,
     get_entry_content,
@@ -28,12 +31,12 @@ from rss_to_wp.feeds import (
     parse_feed,
     pick_entries,
 )
+from rss_to_wp.feeds.filter import parse_entry_date
 from rss_to_wp.images import PexelsClient, download_image, find_fallback_image, find_rss_image
 from rss_to_wp.rewriter import OpenAIRewriter
 from rss_to_wp.storage import DedupeStore
 from rss_to_wp.utils import (
     build_summary_email,
-    get_logger,
     send_email_notification,
     setup_logging,
 )
@@ -205,7 +208,9 @@ def process_weekly_columns(
             skipped += 1
             continue
 
-        logger.info("processing_weekly_column", name=column_config.name, type=column_config.column_type)
+        logger.info(
+            "processing_weekly_column", name=column_config.name, type=column_config.column_type
+        )
 
         context_items = _collect_column_context(column_config, settings, logger)
         rewritten = rewriter.write_weekly_column(
@@ -389,7 +394,7 @@ def run(
         logger.error("config_load_error", error=str(e))
         raise typer.Exit(1)
 
-    feeds = feeds_config.feeds
+    feeds = [feed for feed in feeds_config.feeds if feed.enabled]
     weekly_columns = feeds_config.weekly_columns
 
     # Filter to single feed if specified
@@ -514,11 +519,13 @@ def run(
     )
 
     # Send email notification ONLY if new articles were published
-    if (not dry_run 
+    if (
+        not dry_run
         and published_articles  # Only if there are new articles
-        and settings.smtp_email 
-        and settings.smtp_password 
-        and settings.notification_email):
+        and settings.smtp_email
+        and settings.smtp_password
+        and settings.notification_email
+    ):
         try:
             subject, html_body = build_summary_email(
                 processed_articles=published_articles,
@@ -572,6 +579,9 @@ def process_feed(
         logger.warning("feed_empty_or_failed", name=feed_config.name)
         return (0, 0, 1)
 
+    if not feed_config.source_name and feed.feed.get("title"):
+        feed_config = feed_config.model_copy(update={"source_name": feed.feed["title"]})
+
     # Filter entries
     entries = pick_entries(
         entries=feed.entries,
@@ -586,10 +596,15 @@ def process_feed(
 
     logger.info("entries_to_process", name=feed_config.name, count=len(entries))
 
-    feed_category = feed_config.default_category or ""
-
     for entry_idx, entry in enumerate(entries):
-        if not dry_run and feed_category in category_limits:
+        categories, _ = route_categories(
+            get_entry_title(entry),
+            get_entry_content(entry),
+            feed_config.default_category,
+            feed_config.coverage_area,
+        )
+        feed_category = categories[0] if categories else ""
+        if feed_category in category_limits:
             category_limit = category_limits[feed_category]
             current_count = category_counts.get(feed_category, 0)
             if current_count >= category_limit:
@@ -600,15 +615,17 @@ def process_feed(
                     limit=category_limit,
                     feed=feed_config.name,
                 )
-                skipped += len(entries) - entry_idx
-                break
+                skipped += 1
+                continue
 
         try:
             # Generate unique key
             entry_key = generate_entry_key(entry, feed_config.url)
 
             # Check if already processed
-            if dedupe_store.is_processed(entry_key):
+            if dedupe_store.is_processed(entry_key) or dedupe_store.is_duplicate_source(
+                get_entry_link(entry) or "", source_fingerprint(get_entry_content(entry))
+            ):
                 logger.info(
                     "entry_skipped_duplicate",
                     key=entry_key,
@@ -647,7 +664,7 @@ def process_feed(
                 skipped += 1
                 continue
 
-            if status != "published":
+            if status not in {"published", "draft", "pending"}:
                 errors += 1
                 continue
 
@@ -658,22 +675,30 @@ def process_feed(
                     feed_url=feed_config.url,
                     entry_title=get_entry_title(entry),
                     entry_link=get_entry_link(entry) or "",
-                    category=feed_category or None,
+                    category=feed_category if status == "published" else None,
                     wp_post_id=result.get("id"),
                     wp_post_url=result.get("link"),
+                    source_hash=source_fingerprint(get_entry_content(entry)),
                 )
-                if feed_category in category_limits:
-                    category_counts[feed_category] = category_counts.get(feed_category, 0) + 1
+            if status == "published" and feed_category in category_limits:
+                category_counts[feed_category] = category_counts.get(feed_category, 0) + 1
 
             processed += 1
 
             # Track for email notification
-            if not dry_run and published_articles is not None and result.get("link"):
-                published_articles.append({
-                    "title": result.get("title", {}).get("rendered", get_entry_title(entry)),
-                    "url": result.get("link"),
-                    "feed_name": feed_config.name,
-                })
+            if (
+                not dry_run
+                and status == "published"
+                and published_articles is not None
+                and result.get("link")
+            ):
+                published_articles.append(
+                    {
+                        "title": result.get("title", {}).get("rendered", get_entry_title(entry)),
+                        "url": result.get("link"),
+                        "feed_name": feed_config.name,
+                    }
+                )
 
             # Rate limit between entries
             time.sleep(1)
@@ -707,8 +732,20 @@ def process_entry(
     title = get_entry_title(entry)
     content = get_entry_content(entry)
     link = get_entry_link(entry)
+    if not link or not canonical_source_url(link):
+        return {"_status": "skipped", "_skip_reason": "missing_valid_source_url"}
+
+    categories, routing_reasons = route_categories(
+        title, content, feed_config.default_category, feed_config.coverage_area
+    )
+    published_date = parse_entry_date(entry)
+    source_name = feed_config.source_name or feed_config.name
 
     logger.info("processing_entry", title=title[:50])
+
+    if re.search(r"\b(?:promo|coupon)\s+codes?\b|\bno sweat (?:entries|bets)\b", title, re.I):
+        logger.info("entry_skipped_promotion", title=title[:80])
+        return {"_status": "skipped", "_skip_reason": "commercial_promotion"}
 
     quality_ok, quality_reason = _has_sufficient_story_content(content)
     if not quality_ok:
@@ -725,11 +762,59 @@ def process_entry(
         content=content,
         original_title=title,
         use_original_title=feed_config.use_original_title,
+        source_name=source_name,
+        source_url=link,
+        published_at=published_date.isoformat() if published_date else "unknown",
     )
 
     if not rewritten:
         logger.error("rewrite_failed", title=title[:50])
         return None
+
+    reasons = list(dict.fromkeys(routing_reasons + rewritten.get("review_reasons", [])))
+    if rewritten.get("ready_for_publication") is not True and not reasons:
+        reasons.append("editorial_review_required")
+    # Do not create even a draft with detected unsupported numbers or quotations.
+    if {"numbers_not_in_source", "quote_not_in_source", "missing_headline_or_excerpt"} & set(
+        reasons
+    ):
+        logger.warning("rewrite_rejected", title=title[:80], reasons=reasons)
+        return {"_status": "skipped", "_skip_reason": "unsupported_or_incomplete_rewrite"}
+    post_status = (
+        "draft" if reasons else (feed_config.post_status or settings.wordpress_post_status)
+    )
+    if reasons:
+        logger.warning(
+            "article_requires_review", title=title[:80], reasons=reasons, categories=categories
+        )
+
+    # Dry runs make no WordPress/media/stock-photo requests.
+    if dry_run:
+        logger.info(
+            "dry_run_article",
+            headline=rewritten["headline"],
+            status=post_status,
+            categories=categories,
+            review_reasons=reasons,
+        )
+        return {
+            "_status": "published" if post_status == "publish" else post_status,
+            "id": 0,
+            "link": "dry-run://not-published",
+            "article": rewritten,
+            "categories": categories,
+            "review_reasons": reasons,
+        }
+
+    if not wp_client:
+        return None
+    category_ids = []
+    for category in categories:
+        category_id = wp_client.get_or_create_category(category)
+        if not category_id:
+            logger.error("required_category_unresolved", category=category)
+            return None
+        category_ids.append(category_id)
 
     # Find image
     featured_media_id = None
@@ -776,11 +861,6 @@ def process_entry(
             alt_text=image_alt,
         )
 
-    # Get/create category
-    category_id = None
-    if not dry_run and wp_client and feed_config.default_category:
-        category_id = wp_client.get_or_create_category(feed_config.default_category)
-
     # Get/create tags
     tag_ids = []
     if not dry_run and wp_client and feed_config.default_tags:
@@ -809,17 +889,34 @@ def process_entry(
         title=rewritten["headline"],
         content=rewritten["body"],
         excerpt=rewritten.get("excerpt", ""),
-        category_id=category_id,
+        category_ids=category_ids,
         tag_ids=tag_ids,
         featured_media_id=featured_media_id,
         source_url=link,
+        source_name=source_name,
+        status=post_status,
     )
 
     if not post:
         return None
 
-    post["_status"] = "published"
+    post["_status"] = "published" if post_status == "publish" else post_status
     return post
+
+
+@app.command()
+def collect_official_updates(
+    config: Path = typer.Option(Path("official_sources.yaml"), "--config"),
+    data_dir: Optional[Path] = typer.Option(None, "--data-dir"),
+    min_hours: int = typer.Option(12, "--min-hours", min=0),
+) -> None:
+    """Collect official-page changes for editorial review; never publish articles."""
+    from rss_to_wp.official_sources import collect_updates
+
+    summary = collect_updates(config, data_dir or get_data_dir(), min_hours=min_hours)
+    typer.echo(json.dumps(summary, indent=2))
+    if summary["errors"]:
+        raise typer.Exit(1)
 
 
 @app.command()

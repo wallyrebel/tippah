@@ -25,6 +25,10 @@ on:
 env:
   PYTHON_VERSION: '3.11'
 
+concurrency:
+  group: tippah-wordpress-publisher
+  cancel-in-progress: false
+
 jobs:
   process-feeds:
     runs-on: ubuntu-latest
@@ -44,6 +48,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -e .
+          pip install pytest
+
+      - name: Check editorial and publishing safeguards
+        run: python -m pytest -q
 
       - name: Create data directory
         run: mkdir -p data
@@ -55,6 +63,29 @@ jobs:
           key: processed-db-${{ github.run_id }}
           restore-keys: |
             processed-db-
+
+      - name: Restore official source baseline
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/official-source-state.json
+            data/official-source-review/
+          key: official-sources-${{ github.run_id }}
+          restore-keys: |
+            official-sources-
+
+      - name: Collect official local reporting leads
+        continue-on-error: true
+        run: python -m rss_to_wp collect-official-updates --min-hours 12
+
+      - name: Save official reporting leads for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: official-local-reporting-leads
+          path: data/official-source-review/
+          if-no-files-found: ignore
+          retention-days: 14
 
       - name: Run RSS to WordPress
         env:
@@ -81,26 +112,38 @@ jobs:
           SMTP_EMAIL: ${{ secrets.SMTP_EMAIL }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
           NOTIFICATION_EMAIL: ${{ secrets.NOTIFICATION_EMAIL }}
+          RUN_DRY: ${{ github.event.inputs.dry_run || 'false' }}
+          SINGLE_FEED: ${{ github.event.inputs.single_feed }}
         run: |
-          ARGS="--config feeds.yaml"
+          ARGS=(--config feeds.yaml)
           
           # Add dry-run flag if specified
-          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
-            ARGS="$ARGS --dry-run"
+          if [ "$RUN_DRY" = "true" ]; then
+            ARGS+=(--dry-run)
           fi
           
           # Add single-feed flag if specified
-          if [ -n "${{ github.event.inputs.single_feed }}" ]; then
-            ARGS="$ARGS --single-feed '${{ github.event.inputs.single_feed }}'"
+          if [ -n "$SINGLE_FEED" ]; then
+            ARGS+=(--single-feed "$SINGLE_FEED")
           fi
           
-          python -m rss_to_wp run $ARGS
+          python -m rss_to_wp run "${ARGS[@]}"
 
       - name: Save database to cache
+        if: always()
         uses: actions/cache/save@v4
         with:
           path: data/processed.db
           key: processed-db-${{ github.run_id }}
+
+      - name: Save official source baseline
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/official-source-state.json
+            data/official-source-review/
+          key: official-sources-${{ github.run_id }}
 
       - name: Summary
         if: always()

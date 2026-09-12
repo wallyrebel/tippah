@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Optional
 
 from rss_to_wp.config import get_data_dir
+from rss_to_wp.editorial import canonical_source_url
 from rss_to_wp.utils import get_logger
 
 logger = get_logger("storage.dedupe")
@@ -62,6 +63,8 @@ class DedupeStore:
             }
             if "category" not in columns:
                 conn.execute("ALTER TABLE processed_entries ADD COLUMN category TEXT")
+            if "source_hash" not in columns:
+                conn.execute("ALTER TABLE processed_entries ADD COLUMN source_hash TEXT")
 
             conn.execute("""
                 CREATE INDEX IF NOT EXISTS idx_category_processed_at
@@ -112,6 +115,7 @@ class DedupeStore:
         category: Optional[str] = None,
         wp_post_id: Optional[int] = None,
         wp_post_url: Optional[str] = None,
+        source_hash: Optional[str] = None,
     ) -> None:
         """Mark an entry as processed.
 
@@ -128,8 +132,8 @@ class DedupeStore:
             conn.execute(
                 """
                 INSERT OR REPLACE INTO processed_entries
-                (entry_key, feed_url, category, entry_title, entry_link, wp_post_id, wp_post_url, processed_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                (entry_key, feed_url, category, entry_title, entry_link, wp_post_id, wp_post_url, processed_at, source_hash)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     entry_key,
@@ -140,6 +144,7 @@ class DedupeStore:
                     wp_post_id,
                     wp_post_url,
                     datetime.utcnow().isoformat(),
+                    source_hash,
                 ),
             )
             conn.commit()
@@ -150,6 +155,25 @@ class DedupeStore:
             category=category,
             wp_post_id=wp_post_id,
         )
+
+    def is_duplicate_source(self, source_url: str, source_hash: str) -> bool:
+        """Catch cross-feed copies even when aggregators assign a new GUID."""
+        canonical = canonical_source_url(source_url)
+        with self._get_connection() as conn:
+            if (
+                source_hash
+                and conn.execute(
+                    "SELECT 1 FROM processed_entries WHERE source_hash = ? AND wp_post_id IS NOT NULL LIMIT 1",
+                    (source_hash,),
+                ).fetchone()
+            ):
+                return True
+            rows = conn.execute(
+                "SELECT entry_link FROM processed_entries WHERE wp_post_id IS NOT NULL"
+            )
+            return bool(canonical) and any(
+                canonical_source_url(row["entry_link"] or "") == canonical for row in rows
+            )
 
     def get_published_count_for_category_between(
         self,

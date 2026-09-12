@@ -4,11 +4,13 @@ from __future__ import annotations
 
 import re
 import time
+from html import escape, unescape
 from typing import Optional
-from urllib.parse import quote
+from urllib.parse import urlsplit
 
 import requests
 
+from rss_to_wp.editorial import TARGET_SLUGS, canonical_source_url
 from rss_to_wp.utils import get_logger
 from rss_to_wp.wordpress.media import wp_upload_media
 
@@ -40,10 +42,12 @@ class WordPressClient:
 
         self.session = requests.Session()
         self.session.auth = (username, password)
-        self.session.headers.update({
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        })
+        self.session.headers.update(
+            {
+                "Content-Type": "application/json",
+                "Accept": "application/json",
+            }
+        )
 
         self._category_cache: dict[str, int] = {}
         self._tag_cache: dict[str, int] = {}
@@ -131,7 +135,7 @@ class WordPressClient:
             # Check if any post actually contains this exact URL
             for post in posts:
                 content = post.get("content", {}).get("rendered", "")
-                if source_url in content:
+                if unescape(source_url) in unescape(content):
                     logger.info(
                         "duplicate_found_by_source_url",
                         source_url=source_url[:60],
@@ -144,7 +148,7 @@ class WordPressClient:
 
         except Exception as e:
             logger.warning("source_url_check_error", source_url=source_url[:60], error=str(e))
-            return False  # Assume no duplicate on error
+            raise RuntimeError("Could not verify source URL duplication") from e
 
     def get_or_create_category(self, name: str) -> Optional[int]:
         """Get category ID, creating it if it doesn't exist.
@@ -161,7 +165,7 @@ class WordPressClient:
 
         self._rate_limit()
 
-        slug = self._slugify(name)
+        slug = TARGET_SLUGS.get(name, self._slugify(name))
 
         # Try to find existing
         try:
@@ -180,6 +184,13 @@ class WordPressClient:
 
         except Exception as e:
             logger.warning("category_search_error", name=name, error=str(e))
+            return None
+
+        # Target archives already exist on Tippah News. Never create a parallel
+        # archive if a lookup fails or site configuration has changed.
+        if name in TARGET_SLUGS:
+            logger.error("target_category_missing", name=name, slug=slug)
+            return None
 
         # Create new category
         self._rate_limit()
@@ -319,6 +330,8 @@ class WordPressClient:
         featured_media_id: Optional[int] = None,
         source_url: Optional[str] = None,
         status: Optional[str] = None,
+        category_ids: Optional[list[int]] = None,
+        source_name: Optional[str] = None,
     ) -> Optional[dict]:
         """Create a new WordPress post.
 
@@ -335,6 +348,11 @@ class WordPressClient:
         Returns:
             Created post data or None.
         """
+        if source_url:
+            source_url = canonical_source_url(source_url)
+            if not source_url:
+                logger.error("invalid_source_url")
+                return None
         # PRIMARY CHECK: Check for duplicate by source URL (most reliable - URL never changes)
         if source_url and self.check_duplicate_by_source_url(source_url):
             logger.warning(
@@ -343,12 +361,13 @@ class WordPressClient:
                 source_url=source_url[:60],
             )
             return None  # Return None to indicate skip
-        
+
         self._rate_limit()
 
         # Add source attribution to content
         if source_url:
-            source_html = f'\n\n<p><em>Source: <a href="{source_url}" target="_blank" rel="noopener">Original Article</a></em></p>'
+            label = source_name or urlsplit(source_url).hostname or "Source"
+            source_html = f'\n\n<p><em>Source: <a href="{escape(source_url, quote=True)}" rel="noopener">{escape(label)}</a></em></p>'
             content = content + source_html
 
         post_data = {
@@ -360,8 +379,11 @@ class WordPressClient:
         if excerpt:
             post_data["excerpt"] = excerpt
 
-        if category_id:
-            post_data["categories"] = [category_id]
+        resolved_categories = list(
+            dict.fromkeys(category_ids or ([category_id] if category_id else []))
+        )
+        if resolved_categories:
+            post_data["categories"] = resolved_categories
 
         if tag_ids:
             post_data["tags"] = tag_ids

@@ -1,0 +1,27 @@
+# Verified public sources, September 12, 2026. Page changes are reporting leads,
+# not verified news articles. No automatic publication from these page watches.
+sources:
+  - name: Tippah County Board of Supervisors
+    url: https://www.co.tippah.ms.us/elected-officials/board-of-supervisors/
+    categories: [Tippah County News]
+    notes: Meeting information and board contacts. No public minutes feed found.
+  - name: Tippah County Chancery Clerk
+    url: https://www.co.tippah.ms.us/elected-officials/chancery-clerk/
+    categories: [Tippah County News]
+    notes: Official custodian of board minutes; seek agendas and approved minutes for substantive reporting.
+  - name: Tippah County Development Foundation - County Development
+    url: https://tippahcounty.org/about-tippah-county/county-development/
+    categories: [Tippah County News]
+    notes: Check project dates and funding status before reporting page changes as new developments.
+  - name: Tippah County Development Foundation - City Development
+    url: https://tippahcounty.org/about-tippah-county/city-development/
+    categories: [Tippah County News]
+    notes: Municipal project leads; assign Ripley News only to developments actually involving Ripley.
+  - name: Town of Walnut News
+    url: https://www.walnut.ms/news/
+    categories: [Tippah County News]
+    notes: Working RSS also added to feeds.yaml. Latest item at verification was April 8, 2025; never republish the backlog as current.
+  - name: City of Ripley
+    url: https://www.ripley.ms.gov/
+    categories: [Ripley News, Tippah County News]
+    notes: Official home, administration and linked City Calendar. Calendar listings require event-time verification.

@@ -3,9 +3,19 @@
 # =============================================================================
 
 feeds:
+  # Official municipal RSS: new items arrive as drafts for initial editorial review.
+  - name: "Town of Walnut News"
+    url: "https://www.walnut.ms/news?format=rss"
+    source_name: "Town of Walnut"
+    coverage_area: "tippah"
+    default_category: "Tippah County News"
+    default_tags: ["Walnut"]
+    post_status: "draft"
+    max_per_run: 2
   # --- Mississippi Government ---
   - name: "Mississippi Governor"
     url: "https://governorreeves.ms.gov/feed/"
+    coverage_area: "mississippi"
     default_category: "Government"
     default_tags:
       - "Mississippi"
@@ -139,6 +149,7 @@ feeds:
   # --- BMCU Baseball ---
   - name: "BMCU Baseball"
     url: "https://bmcusports.com/rss.aspx?path=baseball"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -149,6 +160,7 @@ feeds:
   # --- BMCU Men's Basketball ---
   - name: "BMCU Men's Basketball"
     url: "https://bmcusports.com/rss.aspx?path=mbball"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -159,6 +171,7 @@ feeds:
   # --- BMCU Women's Basketball ---
   - name: "BMCU Women's Basketball"
     url: "https://bmcusports.com/rss.aspx?path=wbball"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -169,6 +182,7 @@ feeds:
   # --- BMCU Softball ---
   - name: "BMCU Softball"
     url: "https://bmcusports.com/rss.aspx?path=softball"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -179,6 +193,7 @@ feeds:
   # --- BMCU Volleyball ---
   - name: "BMCU Volleyball"
     url: "https://bmcusports.com/rss.aspx?path=vball"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -189,6 +204,7 @@ feeds:
   # --- BMCU Men's Soccer ---
   - name: "BMCU Men's Soccer"
     url: "https://bmcusports.com/rss.aspx?path=msoc"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -199,6 +215,7 @@ feeds:
   # --- BMCU Women's Soccer ---
   - name: "BMCU Women's Soccer"
     url: "https://bmcusports.com/rss.aspx?path=wsoc"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -209,6 +226,7 @@ feeds:
   # --- BMCU Men's Cross Country ---
   - name: "BMCU Men's Cross Country"
     url: "https://bmcusports.com/rss.aspx?path=mcross"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -219,6 +237,7 @@ feeds:
   # --- BMCU Women's Cross Country ---
   - name: "BMCU Women's Cross Country"
     url: "https://bmcusports.com/rss.aspx?path=wcross"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -229,6 +248,7 @@ feeds:
   # --- BMCU Men's Track & Field ---
   - name: "BMCU Men's Track & Field"
     url: "https://bmcusports.com/rss.aspx?path=mtrack"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -239,6 +259,7 @@ feeds:
   # --- BMCU Women's Track & Field ---
   - name: "BMCU Women's Track & Field"
     url: "https://bmcusports.com/rss.aspx?path=wtrack"
+    coverage_area: "tippah"
     default_category: "Sports"
     default_tags:
       - "BMCU"
@@ -354,6 +375,7 @@ feeds:
 
   - name: "CBS News National Headlines"
     url: "https://www.cbsnews.com/latest/rss/main"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"
@@ -362,6 +384,7 @@ feeds:
 
   - name: "NPR National Headlines"
     url: "https://feeds.npr.org/1001/rss.xml"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"
@@ -371,6 +394,7 @@ feeds:
 
   - name: "New York Times U.S."
     url: "https://rss.nytimes.com/services/xml/rss/nyt/US.xml"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"
@@ -380,6 +404,7 @@ feeds:
 
   - name: "ABC News Top Stories"
     url: "https://abcnews.go.com/abcnews/topstories"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"
@@ -389,6 +414,7 @@ feeds:
 
   - name: "BBC U.S. & Canada"
     url: "https://feeds.bbci.co.uk/news/world/us_and_canada/rss.xml"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"
@@ -398,6 +424,7 @@ feeds:
 
   - name: "Fox News Latest"
     url: "https://feeds.feedburner.com/foxnews/latest"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"
@@ -407,6 +434,7 @@ feeds:
 
   - name: "The Hill Home News"
     url: "https://thehill.com/homenews/feed/"
+    coverage_area: "national"
     default_category: "National News"
     default_tags:
       - "National"

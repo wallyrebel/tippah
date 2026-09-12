@@ -4,6 +4,9 @@ Automated RSS feed monitoring, AI-powered article rewriting, and WordPress publi
 
 ## Features
 
+The [editorial workflow](docs/EDITORIAL_WORKFLOW.md) documents local category routing,
+source attribution, publication review checks and official-source collection.
+
 - **RSS Feed Monitoring**: Parse RSS/Atom feeds with robust error handling
 - **AI Rewriting**: Convert feed content to AP-style news using GPT-5 mini with GPT-4.1 nano fallback
 - **Smart Deduplication**: SQLite-based tracking ensures no duplicate posts

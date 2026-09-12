@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Optional
+from typing import Literal, Optional
 
 import pendulum
 import yaml
@@ -20,6 +20,10 @@ class FeedConfig(BaseModel):
     default_tags: list[str] = Field(default_factory=list)
     max_per_run: int = 5
     use_original_title: bool = False
+    source_name: Optional[str] = None
+    coverage_area: Literal["unknown", "ripley", "tippah", "mississippi", "national"] = "unknown"
+    post_status: Optional[Literal["publish", "draft", "pending"]] = None
+    enabled: bool = True
 
     @field_validator("url")
     @classmethod
@@ -133,7 +137,9 @@ class AppSettings(BaseSettings):
     # Email notifications (optional)
     smtp_email: Optional[str] = Field(default=None, description="SMTP sender email")
     smtp_password: Optional[str] = Field(default=None, description="SMTP password/app password")
-    notification_email: Optional[str] = Field(default=None, description="Email to send notifications to")
+    notification_email: Optional[str] = Field(
+        default=None, description="Email to send notifications to"
+    )
 
     @field_validator("wordpress_base_url")
     @classmethod
