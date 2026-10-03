@@ -1,5 +1,14 @@
 # RSS to WordPress Automation
 
+Feed GET requests use a visible bot identity, (10, 30)-second connect/read
+timeouts and at most three attempts for connection failures, timeouts, HTTP 429
+and selected 5xx responses. Backoff is bounded; Retry-After longer than ten
+seconds defers recovery to a later run. Access denials are not retried.
+HTTP error pages and malformed non-feeds remain failures; valid empty RSS/Atom
+feeds are successful empty results. Partial runs retain their feed error counts
+and per-feed results in the `feed-run-report` artifact and Actions summary.
+The official source collector retains its separate robots checks and baseline.
+
 Automated RSS feed monitoring, AI-powered article rewriting, and WordPress publishing.
 
 ## Features

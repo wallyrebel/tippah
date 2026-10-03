@@ -3,12 +3,77 @@
 from __future__ import annotations
 
 from typing import Any, Optional
+import time
 
 import feedparser
+import requests
 
 from rss_to_wp.utils import get_logger
 
 logger = get_logger("feeds.parser")
+
+RETRY_STATUSES = {429, 500, 502, 503, 504}
+MAX_ATTEMPTS = 3
+
+
+def fetch_feed(url: str) -> bytes:
+    """Identified GETs only, with bounded timeouts and at most two retries.
+
+    Never retry access denials. A long Retry-After ends this attempt rather
+    than retrying sooner than the source allows or blocking the whole run.
+    """
+    with requests.Session() as session:
+        session.headers.update(
+            {
+                "User-Agent": "RSS-to-WP-Bot/1.0 (https://github.com/wallyrebel/tippah)",
+                "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml, */*",
+            }
+        )
+        for attempt in range(1, MAX_ATTEMPTS + 1):
+            try:
+                response = session.get(url, timeout=(10, 30))
+            except (requests.ConnectionError, requests.Timeout) as exc:
+                if attempt == MAX_ATTEMPTS:
+                    raise
+                logger.warning("feed_fetch_retry", attempt=attempt, error_type=type(exc).__name__)
+                time.sleep(2 ** (attempt - 1))
+                continue
+            if response.status_code in RETRY_STATUSES and attempt < MAX_ATTEMPTS:
+                delay = 2 ** (attempt - 1)
+                retry_after = response.headers.get("Retry-After")
+                if retry_after:
+                    # HTTP-date values are interpreted below, without guessing.
+                    from email.utils import parsedate_to_datetime
+                    from datetime import datetime, timezone
+
+                    try:
+                        delay = max(delay, float(retry_after))
+                    except ValueError:
+                        try:
+                            delay = max(
+                                delay,
+                                (
+                                    parsedate_to_datetime(retry_after) - datetime.now(timezone.utc)
+                                ).total_seconds(),
+                            )
+                        except (TypeError, ValueError, OverflowError):
+                            response.raise_for_status()
+                    if delay > 10:
+                        response.raise_for_status()
+                logger.warning(
+                    "feed_fetch_retry",
+                    attempt=attempt,
+                    http_status=response.status_code,
+                    backoff_seconds=delay,
+                )
+                response.close()
+                time.sleep(delay)
+                continue
+            response.raise_for_status()
+            if response.status_code != 200:
+                raise ValueError("unexpected_http_status")
+            return response.content
+    raise RuntimeError("feed_attempts_exhausted")
 
 
 def parse_feed(url: str) -> Optional[dict[str, Any]]:
@@ -23,14 +88,23 @@ def parse_feed(url: str) -> Optional[dict[str, Any]]:
     logger.info("parsing_feed", url=url)
 
     try:
-        feed = feedparser.parse(url)
+        # feedparser's URL fetch hides HTTP errors inside an empty parsed feed.
+        # Check the response first and parse bytes, never an error page as RSS.
+        feed = feedparser.parse(fetch_feed(url))
+
+        if not feed.get("version") or (feed.bozo and not feed.entries):
+            logger.error(
+                "feed_invalid_document",
+                error_type=type(feed.get("bozo_exception")).__name__,
+            )
+            return None
 
         # Check for parsing errors
         if feed.bozo and feed.bozo_exception:
             logger.warning(
                 "feed_parse_warning",
                 url=url,
-                error=str(feed.bozo_exception),
+                error_type=type(feed.bozo_exception).__name__,
             )
             # Continue anyway - feedparser often recovers
 
@@ -48,7 +122,8 @@ def parse_feed(url: str) -> Optional[dict[str, Any]]:
         return feed
 
     except Exception as e:
-        logger.error("feed_parse_error", url=url, error=str(e))
+        status = getattr(getattr(e, "response", None), "status_code", None)
+        logger.error("feed_parse_error", error_type=type(e).__name__, http_status=status)
         return None
 
 

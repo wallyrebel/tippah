@@ -136,6 +136,15 @@ jobs:
           path: data/processed.db
           key: processed-db-${{ github.run_id }}
 
+      - name: Save honest feed run outcome
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: feed-run-report
+          path: data/run-report.json
+          if-no-files-found: ignore
+          retention-days: 14
+
       - name: Save official source baseline
         if: always()
         uses: actions/cache/save@v4
@@ -155,6 +164,14 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           printf -- '- **Dry Run**: %s\n' "$SUMMARY_DRY_RUN" >> "$GITHUB_STEP_SUMMARY"
           printf -- '- **Single Feed**: %s\n' "$SUMMARY_SINGLE_FEED" >> "$GITHUB_STEP_SUMMARY"
+          if [ -f data/run-report.json ]; then
+            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+          report = json.loads(Path('data/run-report.json').read_text())
+          print(f"- **Feed outcome**: {report['outcome']}; errors: {report['errors']}")
+          PY
+          fi
           echo "" >> $GITHUB_STEP_SUMMARY
           
           if [ -f data/processed.db ]; then

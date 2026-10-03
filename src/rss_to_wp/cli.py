@@ -456,6 +456,7 @@ def run(
     total_skipped = 0
     total_errors = 0
     published_articles: list[dict] = []  # Track for email notification
+    feed_results = []
 
     for feed_config in feeds:
         try:
@@ -475,6 +476,8 @@ def run(
             total_processed += processed
             total_skipped += skipped
             total_errors += errors
+            feed_results.append({"feed": feed_config.name, "processed": processed,
+                                 "skipped": skipped, "errors": errors})
 
             # Rate limit between feeds
             time.sleep(1)
@@ -486,6 +489,8 @@ def run(
                 error=str(e),
             )
             total_errors += 1
+            feed_results.append({"feed": feed_config.name, "errors": 1,
+                                 "error_type": type(e).__name__})
             continue
 
     # Process configured weekly columns after RSS feed ingest.
@@ -517,6 +522,18 @@ def run(
         total_skipped=total_skipped,
         total_errors=total_errors,
     )
+    # A green Actions job may still have a feed outage. Retain the real outcome.
+    import json
+    report_path = Path("data/run-report.json")
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    outcome = "healthy" if not total_errors else (
+        "partial" if total_processed or total_skipped else "failed"
+    )
+    report_path.write_text(json.dumps({
+        "dry_run": dry_run, "outcome": outcome,
+        "processed": total_processed, "skipped": total_skipped, "errors": total_errors,
+        "feeds": feed_results,
+    }, indent=2), encoding="utf-8")
 
     # Send email notification ONLY if new articles were published
     if (
@@ -575,9 +592,12 @@ def process_feed(
 
     # Parse feed
     feed = parse_feed(feed_config.url)
-    if not feed or not feed.entries:
-        logger.warning("feed_empty_or_failed", name=feed_config.name)
+    if feed is None:
+        logger.warning("feed_fetch_failed", name=feed_config.name)
         return (0, 0, 1)
+    if not feed.entries:
+        logger.info("feed_empty", name=feed_config.name)
+        return (0, 0, 0)
 
     if not feed_config.source_name and feed.feed.get("title"):
         feed_config = feed_config.model_copy(update={"source_name": feed.feed["title"]})
