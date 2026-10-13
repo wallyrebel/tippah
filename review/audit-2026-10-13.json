@@ -31,7 +31,12 @@
       },
       "sources": [
         "https://hailstate.com/news/2026/10/12/mens-basketball-hubbard-secures-all-sec-preseason-media-first-team"
-      ]
+      ],
+      "expected_before_sha256": "466946e780d11b5501791e3778901b15527a5fbb8418c0ce1896a19a7e6ece0d",
+      "append": {
+        "content": "<p><em>Correction (Oct. 13, 2026): Josh Hubbard is a Mississippi State basketball guard. An earlier version incorrectly identified him as a linebacker and described the honor as one for the Bulldogs’ defense.</em></p>"
+      },
+      "approval_note": "Parent-approved dated factual correction note; original before/revision digest preserved."
     },
     {
       "id": 27485,
@@ -63,7 +68,12 @@
       },
       "sources": [
         "https://www.facebook.com/1307924034704058/posts/1545314937631632"
-      ]
+      ],
+      "expected_before_sha256": "dde97371b07897981bd2ce6113b638b6f19c83510de93efd555e178aa630555a",
+      "append": {
+        "content": "<p><em>Correction (Oct. 13, 2026): The sheriff’s office cited in this report is the Panola County Sheriff’s Office. An earlier version incorrectly identified the office and county as DeSoto.</em></p>"
+      },
+      "approval_note": "Parent-approved dated factual correction note; original before/revision digest preserved."
     },
     {
       "id": 27497,
@@ -153,7 +163,8 @@
       "note": "Current listing independently shows milk/soy ingredients. No child-specific medical information added.",
       "append": {
         "content": "<p><em>Correction (Oct. 13, 2026): Earlier wording incorrectly implied these treats were suitable for every child or allergy. Rice Krispies Treats Original Mini Squares include milk and soy ingredients. Check each current package’s ingredients and allergen statement.</em></p>"
-      }
+      },
+      "expected_before_sha256": "28cd90d4928941696fdc84bf0eca9a478ffaa31c42bcb4f3e14c7932fee4f1e7"
     },
     {
       "id": 27418,
@@ -174,7 +185,8 @@
       },
       "sources": [
         "Internal dated forecast consistency: original Oct.12 article body"
-      ]
+      ],
+      "expected_before_sha256": "0780c854df60c68635578b89161c5eada73d7dbe5fa0d171312098d700c30aa5"
     }
   ]
 }
