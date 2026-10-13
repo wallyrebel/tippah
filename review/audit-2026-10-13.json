@@ -76,49 +76,84 @@
       "replacements": {
         "content": [
           {
-            "old": "These five packs cover the whole crowd — chocolate lovers, gummy fans, kids with allergies, and the little ones who need something softer.",
-            "new": "These five packs offer a mix of chocolate, fruit-flavored candy and individually wrapped treats. Check current ingredient and allergen labels before choosing treats for a child.",
+            "old": "These five packs cover the whole crowd — chocolate lovers, gummy fans, kids with allergies, and the little ones who need something softer. All individually wrapped, all ready for the bowl by the front door.",
+            "new": "These five individually wrapped packs offer chocolate, chewy candy and other treats. Suitability depends on each child’s allergies and age; check the current package rather than assuming any pack is safe for everyone.",
             "count": 1
           },
           {
-            "old": "so it’s a safe bet for classroom bags too.",
-            "new": "check the current package label and classroom policy before sharing.",
+            "old": "Peanut-free and tree nut free, gluten free, kosher, and non-melting, so it’s a safe bet for classroom bags too.",
+            "new": "Airheads describes its bars as peanut-free and gluten-free. Check the exact package and the school’s food policy before adding them to classroom bags.",
             "count": 1,
             "variants": [
-              "so it's a safe bet for classroom bags too.",
-              "so it&#8217;s a safe bet for classroom bags too."
+              "Peanut-free and tree nut free, gluten free, kosher, and non-melting, so it's a safe bet for classroom bags too.",
+              "Peanut-free and tree nut free, gluten free, kosher, and non-melting, so it&#8217;s a safe bet for classroom bags too."
             ]
           },
           {
-            "old": "Every year more families hand out a bowl that every kid can eat from, and this is the box that makes it easy.",
-            "new": "No treat is suitable for every child; check the current package label and the child’s dietary requirements before sharing.",
+            "old": "Peanut-free, tree nut free, gluten free, and kosher; non-melting",
+            "new": "Manufacturer describes Airheads bars as peanut-free and gluten-free; check the current label for the exact product",
             "count": 1
           },
           {
-            "old": "The classroom classic: 60 bite-size crispy mini marshmallow squares in festive Halloween packaging — no HFCS, and the small size is just right for younger trick-or-treaters and school parties.",
-            "new": "This pack contains 60 bite-size crispy mini marshmallow squares in Halloween packaging. The listed ingredients include milk and soy; check the current package label before sharing.",
+            "old": "The allergy-friendly option: 50 Organic Pops, Gummy Fruits, and Giggles — top 9 allergen free, USDA Organic, non-GMO, vegan, with no artificial dyes or high-fructose corn syrup. Every year more families hand out a bowl that every kid can eat from, and this is the box that makes it easy.",
+            "new": "This 50-count box includes Pops, Gummy Fruits and Giggles. YumEarth markets the Halloween variety box as free from the top nine allergens, but that claim does not cover every possible allergy. Check every included item’s current ingredients and allergen statement against the individual child’s needs.",
             "count": 1
           },
           {
-            "old": "Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who’d rather see fewer sweets.",
-            "new": "Treats have different ingredients and allergen statements. Rice Krispies Treats contain milk and soy, so they are not a universal alternative for children with food allergies.",
+            "old": "Top 9 allergen free — USDA Organic, non-GMO, vegan, no artificial dyes or HFCS",
+            "new": "Marketed by YumEarth as top-nine-allergen-free; made with organic ingredients, non-GMO and vegan, with no artificial dyes or high-fructose corn syrup",
+            "count": 1
+          },
+          {
+            "old": "The non-candy crowd-pleaser: 80 individually wrapped fruit snacks (64 oz) — peanut-free, fat-free, no high-fructose corn syrup, with 100% daily Vitamin C. Halal and a hit with the 600+ buyers who picked it up this past month; a smart pick for classroom treat bags where candy isn’t allowed.",
+            "new": "The fruit-snack option: 80 individually wrapped packs, listed at 64 ounces total. Check the exact brand, ingredients and allergen statement before buying; fruit snacks are not automatically suitable for a child with food allergies. Ask the school which treats are permitted.",
             "count": 1,
             "variants": [
-              "Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who'd rather see fewer sweets.",
-              "Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who&#8217;d rather see fewer sweets."
+              "The non-candy crowd-pleaser: 80 individually wrapped fruit snacks (64 oz) — peanut-free, fat-free, no high-fructose corn syrup, with 100% daily Vitamin C. Halal and a hit with the 600+ buyers who picked it up this past month; a smart pick for classroom treat bags where candy isn't allowed.",
+              "The non-candy crowd-pleaser: 80 individually wrapped fruit snacks (64 oz) — peanut-free, fat-free, no high-fructose corn syrup, with 100% daily Vitamin C. Halal and a hit with the 600+ buyers who picked it up this past month; a smart pick for classroom treat bags where candy isn&#8217;t allowed."
             ]
           },
           {
-            "old": "Peanut-free and top-9-free options like Airheads, YumEarth, and fruit snacks mean nobody has to sit a bowl out. It matters more every year.",
-            "new": "Check each current package’s ingredient list and allergen statement. A peanut-free or top-nine-free claim does not make a product suitable for every child.",
+            "old": "Peanut-free, fat-free, no HFCS, 100% daily Vitamin C; halal",
+            "new": "Ingredients, allergen statements and dietary certifications must be checked on the exact package",
+            "count": 1
+          },
+          {
+            "old": "The classroom classic: 60 bite-size crispy mini marshmallow squares in festive Halloween packaging — no HFCS, and the small size is just right for younger trick-or-treaters and school parties. #58 in Breakfast Cereal Bars and rated 4.4/5 by buyers.",
+            "new": "This Halloween pack contains 60 mini crispy marshmallow squares. The manufacturer’s Original Mini Squares information lists milk and soy ingredients; check the Halloween package for its current ingredients and warnings. Follow school food rules and choose treats appropriate for the child’s age.",
+            "count": 1
+          },
+          {
+            "old": "Festive Halloween packaging; no high-fructose corn syrup",
+            "new": "Festive Halloween packaging; Original Mini Squares contain milk and soy ingredients; check the exact package",
+            "count": 1
+          },
+          {
+            "old": "Mix candy with a non-candy option.</strong> Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who’d rather see fewer sweets.",
+            "new": "Offer non-food choices.</strong> Keep age-appropriate non-food treats, such as coloring sheets or pencils, available in a separate bowl. Fruit snacks and cereal bars can contain allergens.",
+            "count": 1,
+            "variants": [
+              "Mix candy with a non-candy option.</strong> Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who'd rather see fewer sweets.",
+              "Mix candy with a non-candy option.</strong> Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who&#8217;d rather see fewer sweets."
+            ]
+          },
+          {
+            "old": "Go allergy-friendly for shared bowls.</strong> Peanut-free and top-9-free options like Airheads, YumEarth, and fruit snacks mean nobody has to sit a bowl out. It matters more every year.",
+            "new": "Read every label.</strong> “Peanut-free” and “top-nine-allergen-free” do not mean suitable for every allergy. <a href=\"https://www.foodallergy.org/resources/tips-trick-or-treating-food-allergy\">FARE recommends</a> checking each treat’s label, including mini and fun-size versions, and avoiding treats without ingredient labels. Parents or caregivers should review treats before children eat them.",
             "count": 1
           }
         ]
       },
       "sources": [
+        "https://www.airheads.com/faq/",
+        "https://yumearth.com/collections/halloween/products/halloween-variety-box",
+        "https://www.foodallergy.org/resources/tips-trick-or-treating-food-allergy",
         "https://www.amazon.com/dp/B015GJRWXM/"
       ],
-      "note": "Current listing independently shows milk/soy ingredients. No child-specific medical information added."
+      "note": "Current listing independently shows milk/soy ingredients. No child-specific medical information added.",
+      "append": {
+        "content": "<p><em>Correction (Oct. 13, 2026): Earlier wording incorrectly implied these treats were suitable for every child or allergy. Rice Krispies Treats Original Mini Squares include milk and soy ingredients. Check each current package’s ingredients and allergen statement.</em></p>"
+      }
     },
     {
       "id": 27418,
