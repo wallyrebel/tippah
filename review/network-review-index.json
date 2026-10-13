@@ -1,0 +1,474 @@
+{
+  "sites": [
+    {
+      "site": "https://tippahnews.com",
+      "repository": "wallyrebel/tippah",
+      "review_commit": "d94ecd1e01985eaad7e424d93e613f04ef70c258",
+      "review_url": "https://github.com/wallyrebel/tippah/blob/d94ecd1e01985eaad7e424d93e613f04ef70c258/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/tippah/blob/d94ecd1e01985eaad7e424d93e613f04ef70c258/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/tippah/actions/runs/38424131723",
+      "artifact_id": 11827088548,
+      "artifact_sha256": "sha256:d618a8cbfde7785aad64712d0bf2acc9dd0eba6c1733df0d88a920807c5c12d8",
+      "account": {
+        "id": 1,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 27467,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T00:05:41",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "466946e780d11b5501791e3778901b15527a5fbb8418c0ce1896a19a7e6ece0d",
+          "payload_sha256": "25e3712a8b29ba3724713d0376fcf3491cba25474cf290b8f75a61644249ba6c"
+        },
+        {
+          "id": 27485,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T12:05:37",
+          "fields": [
+            "content",
+            "excerpt"
+          ],
+          "before_sha256": "dde97371b07897981bd2ce6113b638b6f19c83510de93efd555e178aa630555a",
+          "payload_sha256": "40d07d9d6b4384068e43893e1306f36b33206c8afe5b680be0757bc58093933b"
+        },
+        {
+          "id": 27497,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T13:21:33",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "28cd90d4928941696fdc84bf0eca9a478ffaa31c42bcb4f3e14c7932fee4f1e7",
+          "payload_sha256": "e94121b7495b59ffef68c716bfcb9edb7c1178351f0e645e2cab2d12eedc1158"
+        },
+        {
+          "id": 27418,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T13:31:47",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "0780c854df60c68635578b89161c5eada73d7dbe5fa0d171312098d700c30aa5",
+          "payload_sha256": "33f20e66657214a9e4fa4175779131a278603d70a2618c11bd566b9c12ed6596"
+        }
+      ]
+    },
+    {
+      "site": "https://msnewsgroup.com",
+      "repository": "wallyrebel/Wordpress",
+      "review_commit": "81506a44f553aec466d8cd1f4c1f492dcf7e2af4",
+      "review_url": "https://github.com/wallyrebel/Wordpress/blob/81506a44f553aec466d8cd1f4c1f492dcf7e2af4/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/Wordpress/blob/81506a44f553aec466d8cd1f4c1f492dcf7e2af4/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/Wordpress/actions/runs/38424150861",
+      "artifact_id": 11827188263,
+      "artifact_sha256": "sha256:bdf712ba5b15bdf72d3560aa6a6d705d81f486141f0c6c764d7ad7ab7a814dad",
+      "account": {
+        "id": 1,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 33797,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T21:55:10",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "a7a2a7d723c8b581da7d5fef22b4c18f18d2f7e1f335db1412cbea26a9ac1979",
+          "payload_sha256": "1208e064086ad986b4a9ff3fc079d3d339d448bc233ee7f75fe2b3fc7512463b"
+        },
+        {
+          "id": 33788,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-11T21:54:17",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "163959f918e7e07a393b54e4d2a3af1ae3b1cc7643f5d6b685d5f15cda711a49",
+          "payload_sha256": "26da18c984a87ce7bd1d0fb826735497fe848f9083922f9cbefa370e4be47431"
+        }
+      ]
+    },
+    {
+      "site": "https://unionnewsms.com",
+      "repository": "wallyrebel/union",
+      "review_commit": "73cac5dedc6e1a9d9c5442d656345792ad17234d",
+      "review_url": "https://github.com/wallyrebel/union/blob/73cac5dedc6e1a9d9c5442d656345792ad17234d/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/union/blob/73cac5dedc6e1a9d9c5442d656345792ad17234d/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/union/actions/runs/38424170487",
+      "artifact_id": 11827916773,
+      "artifact_sha256": "sha256:4413947f0b883261770afdc546d799131deed7b292d34073add9e4b86d4246a3",
+      "account": {
+        "id": 1,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 4736,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T18:32:18",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "e675a3dcfec03a00750eb92d1c6ff21e6959f4c6b654b20dd8042bf684ca407d",
+          "payload_sha256": "59f99163f81478d7c520b6055c4369a33977784caaa6f049f7a6fecc16022411"
+        },
+        {
+          "id": 4734,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T17:26:50",
+          "fields": [
+            "title",
+            "excerpt",
+            "content"
+          ],
+          "before_sha256": "dc520af61bddf46ef0406ea4cbf8aaecd0c9c23f343ee38a08a2458222fc6ad1",
+          "payload_sha256": "7ca871ac23a6c71c8515d718e8f1aa6457666a7286d78e13dae63b391724c0a3"
+        },
+        {
+          "id": 4746,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T05:41:04",
+          "fields": [
+            "title",
+            "excerpt",
+            "content"
+          ],
+          "before_sha256": "9f68a04c5538823c07dfa0b076b6754370cf63f846960e851c90477ab2cb9552",
+          "payload_sha256": "55b80d4c76e9a2f93f3f9e84c95d6a8c83eb67d3b0e52facb1de34e1784b9c37"
+        },
+        {
+          "id": 4742,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T05:40:33",
+          "fields": [
+            "title",
+            "excerpt",
+            "content"
+          ],
+          "before_sha256": "3eccf7c922a8eb3fc176706c15989e9525fbfbd407fcbf23a6f4921cb7d09ca1",
+          "payload_sha256": "70ff7698f7fc8934b5fd2069d92ef881e903ed0b41903f1caf3fce8e2324bb1d"
+        },
+        {
+          "id": 4744,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T05:40:39",
+          "fields": [
+            "title",
+            "excerpt",
+            "content"
+          ],
+          "before_sha256": "4a2090433840f55eb778b2e05be1c1d434d2ab7361f082e4f610b0637ef8ab7e",
+          "payload_sha256": "990973c0187691e6ce8236434ce1ec7500e214dcafe1227166e52c51d8d28c4e"
+        }
+      ]
+    },
+    {
+      "site": "https://mississippideltareport.com",
+      "repository": "wallyrebel/DeltaAuto",
+      "review_commit": "48328e1d0462f24c8a8d9207fc91f00420e2f9ea",
+      "review_url": "https://github.com/wallyrebel/DeltaAuto/blob/48328e1d0462f24c8a8d9207fc91f00420e2f9ea/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/DeltaAuto/blob/48328e1d0462f24c8a8d9207fc91f00420e2f9ea/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/DeltaAuto/actions/runs/38424184621",
+      "artifact_id": 11827622377,
+      "artifact_sha256": "sha256:f02beadd5d98f73a584e97b0752db9fba056cf8df3d858089e65a666722b77f0",
+      "account": {
+        "id": 1,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 18040,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T11:09:11",
+          "fields": [
+            "title",
+            "excerpt",
+            "content"
+          ],
+          "before_sha256": "2dba73eb4097a502552f5bb7224aff55dcae8ab25a5f39ce86c52b034ebc60e6",
+          "payload_sha256": "1ec9132a792cca8d9d13eaa7705aadc2150a5a7b63b6e20070043e187438113d"
+        },
+        {
+          "id": 17980,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T03:56:30",
+          "fields": [
+            "title",
+            "excerpt",
+            "content"
+          ],
+          "before_sha256": "1eb206c859fb4e63c74bd506b3e871d4ed3a79d6670131d8d3252f66e05ef2c2",
+          "payload_sha256": "12b013ed7f7908da217b6f0d0337fc62a4d04df74044363543f4f9d0d68e6ed8"
+        },
+        {
+          "id": 17992,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T16:30:49",
+          "fields": [],
+          "before_sha256": "df8320168430e18d35ebcbf4d2c060aee5204d460b5dc7421de30c0915648c17",
+          "payload_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": 18020,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T22:42:03",
+          "fields": [],
+          "before_sha256": "939a4217bd21d66c36694a0160befbc2eccfa9811d881268ddde243336f3481f",
+          "payload_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        }
+      ]
+    },
+    {
+      "site": "https://newstupelo.com",
+      "repository": "wallyrebel/tupelo",
+      "review_commit": "8f5401f51d59f5896df019d10c95f780c9eff87b",
+      "review_url": "https://github.com/wallyrebel/tupelo/blob/8f5401f51d59f5896df019d10c95f780c9eff87b/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/tupelo/blob/8f5401f51d59f5896df019d10c95f780c9eff87b/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/tupelo/actions/runs/38424202413",
+      "artifact_id": 11827323122,
+      "artifact_sha256": "sha256:252f8bbd078fcb4c934b32586691b9122123d6323c69444b0ff8165cdf99da4e",
+      "account": {
+        "id": 2,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 2833,
+          "ready": true,
+          "author_id": 2,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-11T22:02:24",
+          "fields": [
+            "content",
+            "excerpt"
+          ],
+          "before_sha256": "878c8c178d45dd3ba514f28f6f425afa24e71431f24848ee61dbb76d1dd3c5a0",
+          "payload_sha256": "8e0c2a699626360f60469d54ba81d076421b817e3aeef6718ab33f2e55572971"
+        }
+      ]
+    },
+    {
+      "site": "https://pontotocnews.com",
+      "repository": "wallyrebel/Pontotoc",
+      "review_commit": "5d31e3abfc858349bbbee607b1ab8297f4f11636",
+      "review_url": "https://github.com/wallyrebel/Pontotoc/blob/5d31e3abfc858349bbbee607b1ab8297f4f11636/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/Pontotoc/blob/5d31e3abfc858349bbbee607b1ab8297f4f11636/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/Pontotoc/actions/runs/38424221256",
+      "artifact_id": 11828606361,
+      "artifact_sha256": "sha256:1583e7bbfef97b5b4a2c76b5d648a0e9c479f0d61872588db7ad3890217a2bea",
+      "account": {
+        "id": 2,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 5955,
+          "ready": true,
+          "author_id": 2,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-08T16:05:44",
+          "fields": [
+            "content",
+            "excerpt"
+          ],
+          "before_sha256": "eef632e445a02787756f5804c11668abfc0ce42f8a7033c760274cb6e22f8cc5",
+          "payload_sha256": "4c085f030f3189c9baf06413250e6f9f9c2c84216c354fc4db6492a5b47f585c"
+        }
+      ]
+    },
+    {
+      "site": "https://alcornnewsms.com",
+      "repository": "wallyrebel/alcorn",
+      "review_commit": "6a847292749fcb1f45a0643a7cf27a915fa9ef94",
+      "review_url": "https://github.com/wallyrebel/alcorn/blob/6a847292749fcb1f45a0643a7cf27a915fa9ef94/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/alcorn/blob/6a847292749fcb1f45a0643a7cf27a915fa9ef94/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/alcorn/actions/runs/38425264734",
+      "artifact_id": 11827464090,
+      "artifact_sha256": "sha256:4343769f0cf1f94244800f86fa7bd699983cf7c4d765440ba85e4ea2cfa44173",
+      "account": {
+        "id": 1,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 12909,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-13T11:15:12",
+          "fields": [
+            "content"
+          ],
+          "before_sha256": "4528b34cacaeed6caeb4e42fe03db03444dc03259a82dde40c42eba2957fc97e",
+          "payload_sha256": "5fcfeab8c7f985ce4696e9a2123b3f8e0c0c92f977e4ab53b02fa12c64aee189"
+        },
+        {
+          "id": 12879,
+          "ready": true,
+          "author_id": 1,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T13:20:32",
+          "fields": [
+            "content",
+            "excerpt"
+          ],
+          "before_sha256": "6646f7aa7c3e81ea9dade6d0564090ff8bf4ed115ad4f3ac61d6b918567fc824",
+          "payload_sha256": "e95a6e5d324bff1454b226777f0995779afbb5c22fee954008ecf47eda687c65"
+        }
+      ]
+    },
+    {
+      "site": "https://oxfordmsnews.com",
+      "repository": "wallyrebel/Oxford",
+      "review_commit": "f0287ee75d3e4e7d5adb17eb7ec80b949d97cbd4",
+      "review_url": "https://github.com/wallyrebel/Oxford/blob/f0287ee75d3e4e7d5adb17eb7ec80b949d97cbd4/review/EXACT_PATCHES.md",
+      "exact_payloads_url": "https://github.com/wallyrebel/Oxford/blob/f0287ee75d3e4e7d5adb17eb7ec80b949d97cbd4/review/final-preflight.json",
+      "preflight_run_url": "https://github.com/wallyrebel/Oxford/actions/runs/38424260416",
+      "artifact_id": 11827822086,
+      "artifact_sha256": "sha256:bd119019adbe243ec56f685ebe739775e00fd211e6d3fe62e6db28c903e7a175",
+      "account": {
+        "id": 2,
+        "capabilities": {
+          "edit_posts": true,
+          "edit_published_posts": true,
+          "edit_others_posts": true,
+          "upload_files": true
+        }
+      },
+      "posts": [
+        {
+          "id": 5218,
+          "ready": true,
+          "author_id": 2,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T01:09:25",
+          "fields": [],
+          "before_sha256": "fcae077efe865372b9bfc978bc6a0686ab8d285776ba0737902994139ea4380f",
+          "payload_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "id": 5220,
+          "ready": true,
+          "author_id": 2,
+          "owned_by_account": true,
+          "write_verified": false,
+          "modified_gmt": "2026-10-12T01:09:36",
+          "fields": [],
+          "before_sha256": "1aea861df6218c0a814c8016b3b41cf56fec8c4da7261f966f50bda97cb6be08",
+          "payload_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        }
+      ]
+    }
+  ],
+  "image": {
+    "url": "https://github.com/wallyrebel/union/blob/73cac5dedc6e1a9d9c5442d656345792ad17234d/review/assets/indoor-volleyball-illustration.png",
+    "proposal_url": "https://github.com/wallyrebel/union/blob/73cac5dedc6e1a9d9c5442d656345792ad17234d/review/image-proposal.json",
+    "sha256": "6d492f1fd27b5181c23014d3d79516c751ad53df3be4b9d3e9160be1a420d440",
+    "posts": [
+      4742,
+      4744
+    ],
+    "assigned": false
+  },
+  "wordpress_writes": 0,
+  "preserved_duplicate_only_posts": [
+    17992,
+    18020,
+    5218,
+    5220
+  ],
+  "apply_enabled": false,
+  "ci_url": "https://github.com/wallyrebel/alcorn/actions/runs/38425264777",
+  "remaining_gate": "Parent review of exact patches and original illustration pixels. Apply needs full before-digest recheck and separate verified REST write/read-back.",
+  "packet_sha256": "2ecbf0e818f2c1a6312ceeba3639d9f74c5171d7cde7f3ab19aa7104c8806073"
+}
