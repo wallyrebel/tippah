@@ -1,0 +1,145 @@
+{
+  "site": "https://tippahnews.com",
+  "repository": "wallyrebel/tippah",
+  "mode": "read-only",
+  "posts": [
+    {
+      "id": 27467,
+      "link": "https://tippahnews.com/mississippi-news/mississippi-news-report-monday-oct-12-horn-lake-shooting-scam-alert/",
+      "rendered_sha256": {
+        "title": "02a2f372b4e668bdc7a5b6cc95e0770ae9065457b31412a5b111bbcc62d2e158",
+        "excerpt": "8d368d577c52db82d52fbad5136854b529027f0e3b6aaccb5864723d28c5863f",
+        "content": "71ceb6bee50fb75b6a9dae220fb9e456d886491c709f26042529ee966e2a3027"
+      },
+      "replacements": {
+        "content": [
+          {
+            "old": "preseason honors for a Mississippi State linebacker",
+            "new": "preseason honors for a Mississippi State basketball guard",
+            "count": 1
+          },
+          {
+            "old": "Mississippi State linebacker Josh Hubbard was named to the Preseason All-SEC First Team by league media, a preseason honor for the Bulldogs’ defense.",
+            "new": "Mississippi State basketball guard Josh Hubbard was named to the preseason All-SEC first team by league media.",
+            "count": 1,
+            "variants": [
+              "Mississippi State linebacker Josh Hubbard was named to the Preseason All-SEC First Team by league media, a preseason honor for the Bulldogs' defense.",
+              "Mississippi State linebacker Josh Hubbard was named to the Preseason All-SEC First Team by league media, a preseason honor for the Bulldogs&#8217; defense."
+            ]
+          }
+        ]
+      },
+      "sources": [
+        "https://hailstate.com/news/2026/10/12/mens-basketball-hubbard-secures-all-sec-preseason-media-first-team"
+      ]
+    },
+    {
+      "id": 27485,
+      "link": "https://tippahnews.com/mississippi-news/mississippi-news-report-tuesday-oct-13-pitcock-manhunt-tennis/",
+      "rendered_sha256": {
+        "title": "2a2561a45e63bed3c0abba77006dce0c65a85abb0866d9e9d992ba7301cedb2d",
+        "excerpt": "848c020c5f8856b014cabe3bac66ae2943143123cc58fc90bbcfadcbbc716e4a",
+        "content": "ead4ea160812426536f9ef12e05b45f56e641f1c839b28c4505ee771fbfb550d"
+      },
+      "replacements": {
+        "content": [
+          {
+            "old": "DeSoto County Sheriff’s Office",
+            "new": "Panola County Sheriff’s Office",
+            "count": 2,
+            "variants": [
+              "DeSoto County Sheriff's Office",
+              "DeSoto County Sheriff&#8217;s Office"
+            ]
+          }
+        ],
+        "excerpt": [
+          {
+            "old": "in DeSoto County",
+            "new": "in Panola County",
+            "count": 1
+          }
+        ]
+      },
+      "sources": [
+        "https://www.facebook.com/1307924034704058/posts/1545314937631632"
+      ]
+    },
+    {
+      "id": 27497,
+      "link": "https://tippahnews.com/mississippi-news/the-5-best-halloween-candy-packs-for-tippah-county-trick-or-treaters/",
+      "rendered_sha256": {
+        "title": "485df609121c4008014debb7e44367517cea0a6d4c6cb968eaf5b6d103d77300",
+        "excerpt": "3d2333b929745732a4f9296e9f9fbc6b5240db902cec28987a43ae6d306e7db6",
+        "content": "2d00ab40830b1751d97d8198b6b140aa46640f5a2945260f949fce43062e7931"
+      },
+      "replacements": {
+        "content": [
+          {
+            "old": "These five packs cover the whole crowd — chocolate lovers, gummy fans, kids with allergies, and the little ones who need something softer.",
+            "new": "These five packs offer a mix of chocolate, fruit-flavored candy and individually wrapped treats. Check current ingredient and allergen labels before choosing treats for a child.",
+            "count": 1
+          },
+          {
+            "old": "so it’s a safe bet for classroom bags too.",
+            "new": "check the current package label and classroom policy before sharing.",
+            "count": 1,
+            "variants": [
+              "so it's a safe bet for classroom bags too.",
+              "so it&#8217;s a safe bet for classroom bags too."
+            ]
+          },
+          {
+            "old": "Every year more families hand out a bowl that every kid can eat from, and this is the box that makes it easy.",
+            "new": "No treat is suitable for every child; check the current package label and the child’s dietary requirements before sharing.",
+            "count": 1
+          },
+          {
+            "old": "The classroom classic: 60 bite-size crispy mini marshmallow squares in festive Halloween packaging — no HFCS, and the small size is just right for younger trick-or-treaters and school parties.",
+            "new": "This pack contains 60 bite-size crispy mini marshmallow squares in Halloween packaging. The listed ingredients include milk and soy; check the current package label before sharing.",
+            "count": 1
+          },
+          {
+            "old": "Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who’d rather see fewer sweets.",
+            "new": "Treats have different ingredients and allergen statements. Rice Krispies Treats contain milk and soy, so they are not a universal alternative for children with food allergies.",
+            "count": 1,
+            "variants": [
+              "Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who'd rather see fewer sweets.",
+              "Pairing a chocolate bag with fruit snacks or Rice Krispies Treats covers the kids with allergies and the parents who&#8217;d rather see fewer sweets."
+            ]
+          },
+          {
+            "old": "Peanut-free and top-9-free options like Airheads, YumEarth, and fruit snacks mean nobody has to sit a bowl out. It matters more every year.",
+            "new": "Check each current package’s ingredient list and allergen statement. A peanut-free or top-nine-free claim does not make a product suitable for every child.",
+            "count": 1
+          }
+        ]
+      },
+      "sources": [
+        "https://www.amazon.com/dp/B015GJRWXM/"
+      ],
+      "note": "Current listing independently shows milk/soy ingredients. No child-specific medical information added."
+    },
+    {
+      "id": 27418,
+      "link": "https://tippahnews.com/tippah-county-news/tippah-county-news-today-october-12-2026-walnut-volleyball-heat-cold-front/",
+      "rendered_sha256": {
+        "title": "3d957a922e0395d10e4a2f1f763712fcd1c194665f4e9e6d9887db4643fe6120",
+        "excerpt": "e3459805ddf34faafe34e0fb37d697ce60f52ecaca38876698df7ccfb2313d9d",
+        "content": "a0262bbfe7f8e8c5340704570a4e80b01b4d7aff4b685bb10fd4b9a5d1ded912"
+      },
+      "replacements": {
+        "content": [
+          {
+            "old": "one more day of near-record heat before a sharp cold front arrives Friday",
+            "new": "several more days of near-record heat before a sharp cold front arrives Friday",
+            "count": 1
+          }
+        ]
+      },
+      "sources": [
+        "Internal dated forecast consistency: original Oct.12 article body"
+      ]
+    }
+  ]
+}
