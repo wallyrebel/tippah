@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from rss_to_wp.rewriter.model_options import chat_model_params, resolve_retired_model
+
 import json
 import re
 import time
@@ -101,7 +103,7 @@ class OpenAIRewriter:
         self,
         api_key: str,
         model: str = "gpt-5-mini",
-        fallback_model: Optional[str] = "gpt-4.1-nano",
+        fallback_model: Optional[str] = "gpt-6-luna",
         max_tokens: int = 4000,
     ):
         """Initialize OpenAI rewriter.
@@ -113,8 +115,8 @@ class OpenAIRewriter:
             max_tokens: Maximum tokens in response.
         """
         self.client = OpenAI(api_key=api_key)
-        self.model = model
-        self.fallback_model = fallback_model
+        self.model = resolve_retired_model(model)
+        self.fallback_model = resolve_retired_model(fallback_model)
         self.max_tokens = max_tokens
         self._last_request_time = 0.0
 
@@ -190,7 +192,7 @@ class OpenAIRewriter:
                     temperature=temperature,
                 )
 
-                response = self.client.chat.completions.create(**api_params)
+                response = self.client.chat.completions.create(**chat_model_params(api_params))
                 choice = response.choices[0]
                 if getattr(choice.message, "refusal", None):
                     logger.warning("openai_refusal", task=task, model=model)
@@ -502,7 +504,7 @@ def rewrite_with_openai(
     original_title: str,
     api_key: str,
     model: str = "gpt-5-mini",
-    fallback_model: Optional[str] = "gpt-4.1-nano",
+    fallback_model: Optional[str] = "gpt-6-luna",
     use_original_title: bool = False,
 ) -> Optional[dict]:
     """Convenience function to rewrite content.

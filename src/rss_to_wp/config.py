@@ -105,7 +105,7 @@ class AppSettings(BaseSettings):
     openai_api_key: str = Field(..., description="OpenAI API key")
     openai_model: str = Field(default="gpt-5-mini", description="Primary OpenAI model")
     openai_fallback_model: str = Field(
-        default="gpt-4.1-nano",
+        default="gpt-6-luna",
         description="Fallback OpenAI model",
     )
 
