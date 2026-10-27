@@ -1,0 +1,51 @@
+{
+  "state": "dry_run_verified",
+  "repository": "wallyrebel/tippah",
+  "host": "tippahnews.com",
+  "post_id": 28264,
+  "stage": "dry-run",
+  "payload_sha256": "2bfffa0f6e5d7bfdbad3009db4f50000774cd7e329f7f0673a7a9992aa0a4098",
+  "ledger_sha256": "b44940ad600ec97d96b25c235913e6a53392fbf37a47b0580e15e2da7f19fd5e",
+  "implementation_sha256": "7bd7211b96dcd20fa174ae88e5be62729c60185e6cb7e7b28c82a0675a7226e3",
+  "run_id": "40538801043",
+  "commit": "d8ba06c9eb5809be008a92b6f37f5ed5857db7d4",
+  "writes_attempted": 0,
+  "raw_payload_sha256": "c270b8ae9987595e800ae6ebe4debb8286937bc5401046ea2a7de151b50cd85b",
+  "before_raw_sha256": {
+    "title": "c19daec5c5b5c009736993d66f0c587b2f131d28eef1dc335b3635c0e88d8678",
+    "content": "a785329c71f5e1c0fa36c1e51f6f04d540a0e84a24fe2629a32aab21eb5761fe",
+    "excerpt": "121a213c315f5647688126e6e79deda3b332a6a12ace509c4f5ab77a48fa7381"
+  },
+  "before_rendered_sha256": {
+    "title": "c19daec5c5b5c009736993d66f0c587b2f131d28eef1dc335b3635c0e88d8678",
+    "content": "f9ea6527ec50b18e60708e8f54c144cec0f49e710e9f4b63f04e11eac91f5e4f",
+    "excerpt": "30606d0e755072509771f592e21627e485d4e817df1d508dd6b477b7a925400b"
+  },
+  "before_modified_gmt": "2026-10-27T11:14:50",
+  "before_identity": {
+    "id": 28264,
+    "status": "publish",
+    "slug": "the-5-best-solar-outdoor-lights-for-tippah-county-rural-driveways",
+    "link": "https://tippahnews.com/mississippi-news/the-5-best-solar-outdoor-lights-for-tippah-county-rural-driveways/",
+    "date": "2026-10-27T06:14:50",
+    "date_gmt": "2026-10-27T11:14:50",
+    "author": 1,
+    "featured_media": 28263,
+    "categories": [
+      8
+    ],
+    "tags": [
+      2939,
+      2948,
+      3355,
+      3354,
+      3353,
+      155
+    ],
+    "comment_status": "open",
+    "ping_status": "closed",
+    "sticky": false,
+    "template": "",
+    "format": "standard"
+  }
+}
