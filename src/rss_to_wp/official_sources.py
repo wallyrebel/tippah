@@ -50,12 +50,20 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
     data_dir.mkdir(parents=True, exist_ok=True)
     state_path = data_dir / "official-source-state.json"
     state = json.loads(state_path.read_text(encoding="utf-8")) if state_path.exists() else {}
-    summary = {"baselined": 0, "unchanged": 0, "changed": 0, "errors": []}
+    summary = {"baselined": 0, "unchanged": 0, "changed": 0, "errors": [],
+               "expected": len(sources), "checked": 0, "outcome": "failed"}
+    report_path = data_dir / "official-source-report.json"
+
+    def save_report():
+        report_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     checked_at = state.get("_checked_at")
-    if checked_at and min_hours:
+    if sources and checked_at and min_hours:
         elapsed = (datetime.now(timezone.utc) - datetime.fromisoformat(checked_at)).total_seconds()
         if elapsed < min_hours * 3600:
-            return {**summary, "deferred": "sources_checked_recently"}
+            summary.update(outcome="deferred", deferred="sources_checked_recently",
+                           last_complete_check=checked_at)
+            save_report()
+            return summary
     robots_cache = {}
     for source in sources:
         url = source["url"]
@@ -65,6 +73,9 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
                 raise ValueError("Source must be a public HTTPS URL")
             origin = f"{parts.scheme}://{parts.netloc}"
             if origin not in robots_cache:
+                # Cache failures too: two pages on one unavailable origin must
+                # not make duplicate robots requests during this collection.
+                robots_cache[origin] = ValueError("Source robots.txt unavailable")
                 response = session.get(origin + "/robots.txt", timeout=(10, 30))
                 robot = RobotFileParser()
                 if response.status_code == 404:
@@ -73,6 +84,8 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
                     response.raise_for_status()
                     robot.parse(response.text.splitlines())
                 robots_cache[origin] = robot
+            if isinstance(robots_cache[origin], Exception):
+                raise robots_cache[origin]
             if not robots_cache[origin].can_fetch(USER_AGENT, url):
                 raise ValueError("Source robots.txt does not allow this page")
             response = session.get(url, timeout=(10, 30))
@@ -81,6 +94,7 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
                 raise ValueError("Expected an HTML page")
             page = extract_page(response.text, response.url)
             digest = hashlib.sha256(json.dumps(page, sort_keys=True).encode()).hexdigest()
+            summary["checked"] += 1
             previous = state.get(url)
             if previous is None:
                 summary["baselined"] += 1
@@ -106,9 +120,14 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
             state[url] = {"hash": digest, "page": page}
         except (requests.RequestException, ValueError, KeyError) as exc:
             summary["errors"].append({"source": source["name"], "error": str(exc)})
-    if not summary["errors"]:
+    if sources and not summary["errors"]:
         state["_checked_at"] = datetime.now(timezone.utc).isoformat()
     temporary = state_path.with_suffix(".tmp")
     temporary.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
     temporary.replace(state_path)
+    summary["outcome"] = (
+        "complete" if sources and not summary["errors"] else
+        "partial" if summary["checked"] else "failed"
+    )
+    save_report()
     return summary

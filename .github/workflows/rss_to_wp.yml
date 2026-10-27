@@ -75,6 +75,7 @@ jobs:
             official-sources-
 
       - name: Collect official local reporting leads
+        id: official-collector
         continue-on-error: true
         run: python -m rss_to_wp collect-official-updates --min-hours 12
 
@@ -136,12 +137,18 @@ jobs:
           path: data/processed.db
           key: processed-db-${{ github.run_id }}
 
+      - name: Combine feed and collector outcomes
+        if: always()
+        run: python -m rss_to_wp.run_outcome
+
       - name: Save honest feed run outcome
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: feed-run-report
-          path: data/run-report.json
+          path: |
+            data/run-report.json
+            data/official-source-report.json
           if-no-files-found: ignore
           retention-days: 14
 
@@ -165,12 +172,7 @@ jobs:
           printf -- '- **Dry Run**: %s\n' "$SUMMARY_DRY_RUN" >> "$GITHUB_STEP_SUMMARY"
           printf -- '- **Single Feed**: %s\n' "$SUMMARY_SINGLE_FEED" >> "$GITHUB_STEP_SUMMARY"
           if [ -f data/run-report.json ]; then
-            python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import json
-          from pathlib import Path
-          report = json.loads(Path('data/run-report.json').read_text())
-          print(f"- **Feed outcome**: {report['outcome']}; errors: {report['errors']}")
-          PY
+            python -m rss_to_wp.run_outcome --summary >> "$GITHUB_STEP_SUMMARY"
           fi
           echo "" >> $GITHUB_STEP_SUMMARY
           

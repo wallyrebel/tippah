@@ -117,3 +117,25 @@ Official sources and implementation reference:
 - https://www.walnut.ms/news/
 - https://www.ripley.ms.gov/
 - https://developers.openai.com/api/docs/guides/structured-outputs
+
+### Collector coverage reporting (October 27, 2026)
+
+`data/official-source-report.json` records complete, partial or failed collection,
+checked/expected counts and per-source errors. A recent fully successful baseline
+is explicitly `deferred`; it is not a fresh check. Failed collections never advance
+the complete-check timestamp or discard prior source baselines. A failed robots
+request is shared by pages at that origin for the current run, avoiding duplicate
+requests; robots denials and unavailable robots files still prevent page fetches.
+
+RSS processing continues independently after collector failure, preserving its
+existing dedupe database, validation and review holds. The final combined
+`data/run-report.json` and Actions summary retain both feed and collector outcomes.
+The overall result cannot be complete when either part is unavailable, invalid
+or missing; partial and failed aggregate results fail the job after artifacts and
+state-saving steps have been attempted. This makes continued collection outages
+visible without rerunning publishing.
+
+At diagnosis, `https://www.co.tippah.ms.us/robots.txt` returned 503 with
+`Retry-After: 3600` and a `U.S.NEXT New Domain` page. The collector correctly stops
+there. Source availability is an external blocker; neither robots handling nor
+source-quality checks have been relaxed. No source URL or schedule was changed.
