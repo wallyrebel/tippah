@@ -1,0 +1,22 @@
+{
+  "post_id": 28264,
+  "scope": "Remove exactly two internal live-price confirmation notes and one Creators API prepublication instruction. Preserve all existing prices, product claims, research-time price-unavailability wording, links and images. No product or pricing assertion added.",
+  "licensing_review": "Current body contains Amazon affiliate disclosure and publisher-authored guide; no licensed article/no-derivatives/republication notice. No product prose or image changed.",
+  "operations": [
+    {
+      "text": "; confirm live price at publish",
+      "replacement": "",
+      "count": 2
+    },
+    {
+      "text": " — enrich via Creators API before publishing; do not publish a guessed price",
+      "replacement": "",
+      "count": 1
+    }
+  ],
+  "source_snapshot_sha256": "f9ea6527ec50b18e60708e8f54c144cec0f49e710e9f4b63f04e11eac91f5e4f",
+  "reviewed_before_modified_gmt": "2026-10-27T11:14:50",
+  "expected_after_rendered_sha256": "87ad78bc3fad42b1b216cb13698913376df22c49cd477ff812c478d0716b2076",
+  "coordination": "Parent confirmed exclusive post28264 ownership; reliability owner idle; current main b350eb310f146f940670681b2dd9e186cd451361 preserved.",
+  "correction_note": "Not required for deletion of internal production instructions; no material factual claims changed."
+}
