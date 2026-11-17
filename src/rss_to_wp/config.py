@@ -114,6 +114,7 @@ class AppSettings(BaseSettings):
     wordpress_username: str = Field(..., description="WordPress username")
     wordpress_app_password: str = Field(..., description="WordPress application password")
     wordpress_post_status: str = Field(default="publish", description="Post status")
+    save_review_drafts: bool = Field(default=True, description="Send editorial holds to WordPress")
 
     # Image fallback providers (optional)
     pexels_api_key: Optional[str] = Field(default=None, description="Pexels API key")

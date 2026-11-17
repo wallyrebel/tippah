@@ -1,5 +1,7 @@
 # RSS to WordPress Automation
 
+The scheduled news publisher sends approved stories to WordPress with public status. It sets `SAVE_REVIEW_DRAFTS=false` and records the reasons for editorial holds in the run log. A change to the source headline or copy allows a held story to be reviewed again.
+
 Feed GET requests use a visible bot identity, (10, 30)-second connect/read
 timeouts and at most three attempts for connection failures, timeouts, HTTP 429
 and selected 5xx responses. Backoff is bounded; Retry-After longer than ten

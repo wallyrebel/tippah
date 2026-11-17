@@ -224,7 +224,9 @@ def test_dry_run_does_not_upload_or_publish(settings):
     assert rewriter.rewrite.call_args.kwargs["published_at"].startswith("2026-09-12")
 
 
-def test_ambiguous_story_is_draft(settings):
+@pytest.mark.parametrize("save_review_drafts", [True, False])
+def test_ambiguous_story_respects_editorial_draft_setting(settings, save_review_drafts):
+    settings.save_review_drafts = save_review_drafts
     rewriter = Mock()
     rewriter.rewrite.return_value = article()
     result = process_entry(
@@ -241,8 +243,30 @@ def test_ambiguous_story_is_draft(settings):
         True,
         Mock(),
     )
-    assert result["_status"] == "draft"
+    assert result["_status"] == ("draft" if save_review_drafts else "skipped")
     assert "geography_needs_review" in result["review_reasons"]
+
+
+def test_editorial_hold_retries_only_when_source_changes(monkeypatch, tmp_path, settings):
+    store = DedupeStore(tmp_path / "history.db")
+    source = {"title": "Water notice", "summary": SOURCE, "link": "https://example.com/water",
+              "published": pendulum.now("UTC").isoformat()}
+    feed = SimpleNamespace(entries=[source], feed={"title": "City"})
+    evaluate = Mock(side_effect=[
+        {"_status": "skipped", "_review_held": True},
+        {"_status": "published", "id": 123, "link": "https://example.com/published"},
+    ])
+    monkeypatch.setattr("rss_to_wp.cli.parse_feed", lambda url: feed)
+    monkeypatch.setattr("rss_to_wp.cli.process_entry", evaluate)
+    args = (FeedConfig(name="City", url="https://example.com/feed"), settings, store,
+            Mock(), Mock(), False, 48, Mock(), {}, {})
+    assert process_feed(*args) == (0, 1, 0)
+    assert process_feed(*args) == (0, 1, 0)
+    assert evaluate.call_count == 1
+    source["summary"] += " The city has now confirmed the work is complete."
+    assert process_feed(*args) == (1, 0, 0)
+    assert process_feed(*args) == (0, 1, 0)
+    assert evaluate.call_count == 2
 
 
 def test_missing_category_prevents_post(settings):

@@ -100,6 +100,7 @@ jobs:
           WORDPRESS_USERNAME: ${{ secrets.WORDPRESS_USERNAME }}
           WORDPRESS_APP_PASSWORD: ${{ secrets.WORDPRESS_APP_PASSWORD }}
           WORDPRESS_POST_STATUS: publish
+          SAVE_REVIEW_DRAFTS: 'false'
           
           # Image providers (optional)
           PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}

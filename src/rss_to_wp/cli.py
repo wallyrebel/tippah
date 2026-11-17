@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import time
@@ -644,10 +645,18 @@ def process_feed(
         try:
             # Generate unique key
             entry_key = generate_entry_key(entry, feed_config.url)
+            revision = json.dumps(
+                [get_entry_title(entry), get_entry_content(entry)], ensure_ascii=False
+            )
+            review_key = f"review:{entry_key}:{hashlib.sha256(revision.encode()).hexdigest()}"
 
             # Check if already processed
-            if dedupe_store.is_processed(entry_key) or dedupe_store.is_duplicate_source(
-                get_entry_link(entry) or "", source_fingerprint(get_entry_content(entry))
+            if (
+                dedupe_store.is_processed(entry_key)
+                or dedupe_store.is_processed(review_key)
+                or dedupe_store.is_duplicate_source(
+                    get_entry_link(entry) or "", source_fingerprint(get_entry_content(entry))
+                )
             ):
                 logger.info(
                     "entry_skipped_duplicate",
@@ -677,7 +686,7 @@ def process_feed(
             if status == "skipped":
                 if not dry_run:
                     dedupe_store.mark_processed(
-                        entry_key=entry_key,
+                        entry_key=review_key if result.get("_review_held") else entry_key,
                         feed_url=feed_config.url,
                         entry_title=get_entry_title(entry),
                         entry_link=get_entry_link(entry) or "",
@@ -811,6 +820,8 @@ def process_entry(
         logger.warning(
             "article_requires_review", title=title[:80], reasons=reasons, categories=categories
         )
+        if not settings.save_review_drafts:
+            return {"_status": "skipped", "_review_held": True, "review_reasons": reasons}
 
     # Dry runs make no WordPress/media/stock-photo requests.
     if dry_run:
