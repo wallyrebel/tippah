@@ -344,12 +344,22 @@ feeds:
 
   - name: "Daily Journal Mississippi"
     url: "https://www.djournal.com/search/?f=rss"
+    # This endpoint is rate-limiting scheduled requests. Retain it for recovery.
+    enabled: false
     default_category: "Mississippi News"
     default_tags:
       - "Mississippi"
       - "Statewide"
       - "Northeast Mississippi"
     max_per_run: 3
+
+  - name: "Mississippi State University Extension"
+    url: "https://extension.msstate.edu/rss.xml"
+    source_name: "Mississippi State University Extension Service"
+    coverage_area: "mississippi"
+    default_category: "Mississippi News"
+    default_tags: ["MSU Extension"]
+    max_per_run: 2
 
   - name: "WCBI Mississippi"
     url: "https://www.wcbi.com/feed/"

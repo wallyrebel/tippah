@@ -2,11 +2,11 @@
 # not verified news articles. No automatic publication from these page watches.
 sources:
   - name: Tippah County Board of Supervisors
-    url: https://www.co.tippah.ms.us/elected-officials/board-of-supervisors/
+    url: https://co.tippah.ms.us/elected-officials/board-of-supervisors/
     categories: [Tippah County News]
     notes: Meeting information and board contacts. No public minutes feed found.
   - name: Tippah County Chancery Clerk
-    url: https://www.co.tippah.ms.us/elected-officials/chancery-clerk/
+    url: https://co.tippah.ms.us/elected-officials/chancery-clerk/
     categories: [Tippah County News]
     notes: Official custodian of board minutes; seek agendas and approved minutes for substantive reporting.
   - name: Tippah County Development Foundation - County Development
