@@ -40,6 +40,11 @@ def main(data_dir: Path = Path("data"), summary: bool = False) -> int:
         print(f"- **Official sources**: {collector.get('outcome')}; "
               f"checked: {collector.get('checked', 0)}/{collector.get('expected', 'unknown')}; "
               f"errors: {len(collector.get('errors', []))}")
+        outages = collector.get("known_outages") or collector.get("errors") or []
+        names = sorted({str(item.get("source")) for item in outages
+                        if isinstance(item, dict) and item.get("source")})
+        if names:
+            print(f"- **Official sources unavailable at last check**: {', '.join(names)}")
     else:
         data_dir.mkdir(parents=True, exist_ok=True)
         path.write_text(json.dumps(report, indent=2) + "\n")

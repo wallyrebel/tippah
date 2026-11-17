@@ -55,3 +55,42 @@ def test_missing_collector_report_cannot_be_healthy(tmp_path):
     assert report["outcome"] == "partial"
     assert report["feed_outcome"] == "healthy"
     assert report["official_sources"]["outcome"] == "failed"
+
+
+def test_partial_check_defers_rechecks_and_keeps_the_outage_visible(tmp_path, capsys):
+    config = tmp_path / "sources.yaml"
+    config.write_text("sources:\n  - name: A\n    url: https://a.example/news\n  - name: B\n    url: https://b.example/news\n")
+    session = Mock()
+    session.get.side_effect = [response("User-agent: *\nAllow: /"), response(page("Verified public notice. " * 10)), requests.HTTPError("certificate verify failed")]
+    assert collect_updates(config, tmp_path, session, min_hours=12)["outcome"] == "partial"
+    count = session.get.call_count
+    # The next scheduled run must not request every source again.
+    report = collect_updates(config, tmp_path, session, min_hours=12)
+    assert report["outcome"] == "deferred" and session.get.call_count == count
+    assert [item["source"] for item in report["known_outages"]] == ["B"]
+    assert report["last_complete_check"] is None
+    # The broken source is still named in every run summary while deferred.
+    (tmp_path / "run-report.json").write_text(json.dumps({"feed_outcome": "healthy", "errors": 0}))
+    assert main(tmp_path, summary=True) == 0
+    assert "Official sources unavailable at last check**: B" in capsys.readouterr().out
+    # After the interval the outage is checked again and reported as partial.
+    state_path = tmp_path / "official-source-state.json"
+    state = json.loads(state_path.read_text())
+    state["_attempted_at"] = "2026-01-01T00:00:00+00:00"
+    state_path.write_text(json.dumps(state))
+    session.get.side_effect = [response("User-agent: *\nAllow: /"), response(page("Verified public notice. " * 10)), requests.HTTPError("certificate verify failed")]
+    assert collect_updates(config, tmp_path, session, min_hours=12)["outcome"] == "partial"
+    # Recovery clears the remembered outage.
+    session.get.side_effect = [response("User-agent: *\nAllow: /"), response(page("Verified public notice. " * 10))] * 2
+    assert collect_updates(config, tmp_path, session)["outcome"] == "complete"
+    assert json.loads(state_path.read_text())["_outages"] == []
+
+
+def test_total_failure_is_retried_on_the_next_run(tmp_path):
+    config = tmp_path / "sources.yaml"
+    config.write_text("sources:\n  - name: A\n    url: https://a.example/news\n")
+    session = Mock()
+    session.get.side_effect = requests.ConnectionError("runner offline")
+    assert collect_updates(config, tmp_path, session, min_hours=12)["outcome"] == "failed"
+    assert collect_updates(config, tmp_path, session, min_hours=12)["outcome"] == "failed"
+    assert session.get.call_count == 2

@@ -57,11 +57,16 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
     def save_report():
         report_path.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     checked_at = state.get("_checked_at")
-    if sources and checked_at and min_hours:
-        elapsed = (datetime.now(timezone.utc) - datetime.fromisoformat(checked_at)).total_seconds()
+    # A partial check (some sources down) also starts the interval. Otherwise one
+    # broken official website made every scheduled run re-request every source
+    # and report a new failure, instead of re-checking after ``min_hours``.
+    last_check = max(filter(None, (checked_at, state.get("_attempted_at"))), default=None)
+    if sources and last_check and min_hours:
+        elapsed = (datetime.now(timezone.utc) - datetime.fromisoformat(last_check)).total_seconds()
         if elapsed < min_hours * 3600:
             summary.update(outcome="deferred", deferred="sources_checked_recently",
-                           last_complete_check=checked_at)
+                           last_complete_check=checked_at, last_check=last_check,
+                           known_outages=state.get("_outages", []))
             save_report()
             return summary
     robots_cache = {}
@@ -122,6 +127,12 @@ def collect_updates(config: Path, data_dir: Path, session=None, min_hours: int =
             summary["errors"].append({"source": source["name"], "error": str(exc)})
     if sources and not summary["errors"]:
         state["_checked_at"] = datetime.now(timezone.utc).isoformat()
+    if sources and summary["checked"]:
+        # Only when at least one source answered: a total failure is more likely
+        # our network than six official sites, so it is retried on the next run.
+        state["_attempted_at"] = datetime.now(timezone.utc).isoformat()
+        # Carried into deferred reports so a known outage stays visible.
+        state["_outages"] = summary["errors"]
     temporary = state_path.with_suffix(".tmp")
     temporary.write_text(json.dumps(state, ensure_ascii=False, indent=2), encoding="utf-8")
     temporary.replace(state_path)
