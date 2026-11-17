@@ -3,14 +3,14 @@
 # =============================================================================
 
 feeds:
-  # Official municipal RSS: new items arrive as drafts for initial editorial review.
+  # Official municipal RSS: publish items that pass the editorial review.
   - name: "Town of Walnut News"
     url: "https://www.walnut.ms/news?format=rss"
     source_name: "Town of Walnut"
     coverage_area: "tippah"
     default_category: "Tippah County News"
     default_tags: ["Walnut"]
-    post_status: "draft"
+    post_status: "publish"
     max_per_run: 2
   # --- Mississippi Government ---
   - name: "Mississippi Governor"
